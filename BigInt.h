@@ -36,44 +36,35 @@ public:
 	{
 		*this = other;
 	}
-	~BigInt() { free(bytes); }
+	~BigInt() { delete bytes; }
+
+	BigInt& operator=(const BigInt& other) {
+		if (this != &other) {
+			delete bytes;
+			byteCount = other.byteCount;
+			isNegative = other.isNegative;
+
+			// Sao chép từng byte
+			if (byteCount > 0)
+			{
+				bytes = new byte[byteCount];
+				for (int i = 0; i < byteCount; i++)
+				{
+					bytes[i] = other.bytes[i];
+				}
+			}
+			else
+				bytes = nullptr;
+		}
+		return *this;
+	}
 
 public:
 };
 
 class Converter {
 public:
-	static byte stringToByte(string byteString) {
-		byte result = 0;
-
-		for (char bit : byteString) {
-			// Dịch trái sang một vị trí để có vị trí trống ở cuối
-			result = result << 1;
-
-			// Thêm bit vào cuối
-			result += bit - '0';
-		}
-
-		return result;
-	}
-
-	static string byteToString(byte byteNumber)
-	{
-		string byteString;
-
-		for (int i = 0; i < 8; i++)
-		{
-			// Lấy bit thứ i
-			byteString += to_string(byteNumber & 1);
-
-			// Dịch dãy các bits sang một bit để lấy bit tiếp theo
-			byteNumber >>= 1;
-		}
-
-		return byteString;
-	}
-
-	static string toBigEndian(string littleEndian)
+	static string reverseString(string littleEndian)
 	{
 		reverse(littleEndian.begin(), littleEndian.end());
 		return littleEndian;
@@ -92,61 +83,99 @@ public:
 		return result;
 	}
 
-	static byte* binStringToBytes(string bytesString, int& byteCount)
+	static byte stringToByte(string str)
 	{
-		int offset = 0, k = 0;
-		int binStrLength = bytesString.length();
+		byte result = 0;
 
-		byteCount = binStrLength / 8 + (binStrLength % 8 != 0);
-		byte* bytes = new byte[byteCount];
+		for (char bit : str) {
+			// Dịch trái sang một vị trí để có vị trí trống ở cuối
+			result = result << 1;
 
-		do {
-			string byteString;
-
-			if (binStrLength - 8 >= 0)
-				byteString = bytesString.substr(offset, 8);
-			else
-				byteString = bytesString.substr(offset, binStrLength);
-
-			byte byteNumber = Converter::stringToByte(byteString);
-			bytes[k] = byteNumber;
-
-			offset += 8;
-			k += 1;
-		} while (offset <= binStrLength);
-
-		return bytes;
-	}
-
-	static string bytesToBinString(byte* byte, int byteCount)
-	{
-		string binString;
-
-		for (int i = 0; i < byteCount; i++)
-		{
-			string byteString = Converter::byteToString(byte[i]);
-			binString += byteString + " ";
+			// Thêm bit vào cuối
+			result += bit - '0';
 		}
 
-		return binString;
+		return result;
+	}
+
+	static string byteToString(byte number)
+	{
+		string result;
+
+		for (int i = 0; i < 8; i++)
+		{
+			// Lấy bit thứ i
+			result += to_string(number & 1);
+
+			// Dịch dãy các bits sang một bit để lấy bit tiếp theo
+			number >>= 1;
+		}
+
+		return result;
+	}
+
+	static BigInt binaryStrToBigInt(string str)
+	{
+		int offset = 0;
+		int length = str.length();
+		int byteCount = length / 8 + (length % 8 != 0);
+
+		// Khởi tạo một số BigInt mới
+		BigInt result;
+		result.bytes = new byte[byteCount];
+		result.byteCount = byteCount;
+
+		// Tách các octets
+		for (int i = 0; i < byteCount; i++)
+		{
+			string byteStr;
+
+			if (length - 8 >= 0)
+				byteStr = str.substr(offset, 8);
+			else
+				byteStr = str.substr(offset, length);
+
+			result.bytes[i] = Converter::stringToByte(byteStr);
+
+			offset += 8;
+			length -= 8;
+		}
+
+		return result;
+	}
+
+	static string bigIntToBinaryStr(BigInt number)
+	{
+		string result;
+
+		for (int i = 0; i < number.byteCount; i++)
+		{
+			string str = Converter::byteToString(number.bytes[i]);
+			string bigEndian = Converter::reverseString(str);
+			result += bigEndian + " ";
+		}
+
+		return result;
 	}
 };
 
 class IO
 {
 public:
-	static byte* inputBin(int& byteCount)
+	static BigInt inputBin(const char* binaryString)
 	{
-		string binString;
-		getline(cin, binString);
-		binString = Converter::removeSpaces(binString);
+		BigInt result;
 
-		byte* bytes = Converter::binStringToBytes(binString, byteCount);
-		return bytes;
+		result = Converter::binaryStrToBigInt(binaryString);
+
+		return result;
 	}
-	static void outputBin(byte* bytes, int byteCount)
+	static string outputBin(BigInt number)
 	{
-		string binString = Converter::bytesToBinString(bytes, byteCount);
-		cout << binString << endl;
+		string result;
+
+		result = Converter::bigIntToBinaryStr(number);
+
+		return result;
 	}
 };
