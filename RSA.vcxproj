@@ -128,10 +128,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BigInt.cpp" />
+    <ClCompile Include="BigIntConverter.cpp" />
+    <ClCompile Include="BigIntIO.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BigInt.h" />
+    <ClInclude Include="BigIntConverter.h" />
+    <ClInclude Include="BigIntIO.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
