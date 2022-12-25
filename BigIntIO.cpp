@@ -1,8 +1,8 @@
 #include "BigIntIO.h"
 
-BigInt* BigIntIO::inputBin(string binaryString)
+BigInt BigIntIO::inputBin(string binaryString)
 {
-	BigInt* result;
+	BigInt result;
 
 	result = BigIntConverter::binaryStrToBigInt(binaryString);
 
@@ -17,9 +17,9 @@ string BigIntIO::outputBin(BigInt* number)
 	return result;
 }
 
-void BigIntIO::displayInputs(BigInt a, BigInt b)
+void BigIntIO::displayInputs(BigInt a, BigInt b, string op)
 {
-	cout << "Input:\n";
+	cout << "Input for " << op << "\n";
 	cout << BigIntConverter::bigIntToBinaryStr(&a) << endl;
 	cout << BigIntConverter::bigIntToBinaryStr(&b) << endl;
 	cout << "\n";

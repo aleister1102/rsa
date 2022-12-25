@@ -43,10 +43,22 @@ void addByte(BigInt* number, int amount)
 {
 	int idx = number->byteCount;
 	number->byteCount += amount;
-	number->bytes = (byte*)realloc(number->bytes, number->byteCount);
+	number->bytes = (byte*)realloc(number->bytes, number->byteCount * sizeof(byte));
 
 	for (int i = 0; i < amount; i++)
 		number->bytes[idx + i] = 0b00000000;
+}
+
+void removeLastByteIfNull(BigInt* number)
+{
+	byte lastByte = number->bytes[number->byteCount - 1];
+
+	if (lastByte) return;
+	else
+	{
+		number->byteCount -= 1;
+		number->bytes = (byte*)realloc(number->bytes, number->byteCount * sizeof(byte));
+	}
 }
 
 BigInt operator+(BigInt a, BigInt b)
@@ -61,7 +73,7 @@ BigInt operator+(BigInt a, BigInt b)
 		addByte(lesserByteNumber, abs(a.byteCount - b.byteCount));
 	}
 
-	BigIntIO::displayInputs(a, b);
+	BigIntIO::displayInputs(a, b, "+");
 
 	// Nếu cả hai số đều có bit đầu là 1 thì tăng số byte của kết quả lên 1
 	int resultByteCount = maxByteCount + (getFirstBit(a) || getFirstBit(b));
@@ -86,6 +98,56 @@ BigInt operator+(BigInt a, BigInt b)
 
 	if (carry)
 		result.bytes[result.byteCount - 1] += 1;
+
+	removeLastByteIfNull(&result);
+
+	return result;
+}
+
+BigInt operator+(BigInt a, int value)
+{
+	BigInt b(value);
+
+	BigInt result;
+	result.byteCount = a.byteCount;
+	result.bytes = (byte*)malloc(result.byteCount * sizeof(byte));
+	memset(result.bytes, 0, result.byteCount);
+
+	result = a + b;
+
+	return result;
+}
+
+void twoComplement(BigInt& number)
+{
+	for (int i = 0; i < number.byteCount; i++)
+	{
+		number.bytes[i] = ~number.bytes[i];
+	}
+
+	number = number + 1;
+}
+
+BigInt operator-(BigInt a, BigInt b)
+{
+	int maxByteCount = maxByte(a.byteCount, b.byteCount);
+
+	twoComplement(b);
+
+	// Trường hợp hai số có kích thước byte khác nhau
+	if (a.byteCount != b.byteCount)
+	{
+		// Lấy số có kích thước byte ít hơn và cấp phát thêm vùng nhớ
+		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
+		addByte(lesserByteNumber, abs(a.byteCount - b.byteCount));
+	}
+
+	BigInt result;
+	result.byteCount = maxByteCount;
+	result.bytes = (byte*)malloc(result.byteCount * sizeof(byte));
+	memset(result.bytes, 0, result.byteCount);
+
+	result = a + b;
 
 	return result;
 }

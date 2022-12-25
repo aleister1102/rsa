@@ -26,6 +26,11 @@ public:
 public:
 	BigInt()
 		: bytes(nullptr), byteCount(0) {}
+	BigInt(int value) // value < 255
+		: bytes(nullptr), byteCount(1) {
+		bytes = (byte*)malloc(byteCount * sizeof(byte));
+		bytes[0] = value;
+	}
 	BigInt(byte* bytes, int byteCount)
 		: bytes(bytes), byteCount(byteCount) {}
 	BigInt(const BigInt& other)
@@ -60,3 +65,5 @@ public:
 };
 
 BigInt operator + (BigInt a, BigInt b);
+BigInt operator + (BigInt a, int value);
+BigInt operator - (BigInt a, BigInt b);

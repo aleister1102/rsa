@@ -14,14 +14,17 @@ int main()
 	}
 	f.close();
 
-	BigInt* a = BigIntIO::inputBin(numberA);
+	BigInt a = BigIntIO::inputBin(numberA);
 	//cout << BigIntIO::outputBin(a) << endl;
 
-	BigInt* b = BigIntIO::inputBin(numberB);
+	BigInt b = BigIntIO::inputBin(numberB);
 	//cout << BigIntIO::outputBin(b) << endl;
 
-	BigInt sum = *a + *b;
-	cout << BigIntIO::outputBin(&sum) << endl;
+	//BigInt sum = a + b;
+	//cout << "Result: \n" << BigIntIO::outputBin(&sum) << "\n";
+
+	BigInt different = a - b;
+	cout << "Result: \n" << BigIntIO::outputBin(&different) << "\n";
 
 	return 0;
 }

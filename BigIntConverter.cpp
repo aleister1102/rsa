@@ -52,15 +52,15 @@ string BigIntConverter::byteToString(byte number, bool isReversed)
 	return result;
 }
 
-BigInt* BigIntConverter::binaryStrToBigInt(string str)
+BigInt BigIntConverter::binaryStrToBigInt(string str)
 {
 	int length = str.length();
 	int offset = length;
 	int byteCount = length / 8 + (length % 8 != 0);
 
-	BigInt* result = new BigInt();
-	result->byteCount = byteCount;
-	result->bytes = (byte*)malloc(result->byteCount * sizeof(byte));
+	BigInt result;
+	result.byteCount = byteCount;
+	result.bytes = (byte*)malloc(result.byteCount * sizeof(byte));
 
 	// Tách các octets
 	for (int i = 0; i < byteCount; i++)
@@ -74,7 +74,7 @@ BigInt* BigIntConverter::binaryStrToBigInt(string str)
 			else
 				byteStr = str.substr(0, length);
 
-			result->bytes[i] = BigIntConverter::stringToByte(byteStr);
+			result.bytes[i] = BigIntConverter::stringToByte(byteStr);
 		}
 		catch (exception e)
 		{
