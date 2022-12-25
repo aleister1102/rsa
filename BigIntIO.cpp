@@ -28,7 +28,8 @@ void BigIntIO::displayInputs(BigInt a, BigInt b)
 void BigIntIO::testOperatorForByte(byte a, byte b, byte result, string op)
 {
 	cout << BigIntConverter::byteToString(a, true) << "\n " << op << " \n";
-	cout << BigIntConverter::byteToString(b, true) << endl;
-	cout << "-----------------" << endl;
-	cout << BigIntConverter::byteToString(result, true) << endl;
+	cout << BigIntConverter::byteToString(b, true) << "\n";
+	cout << "-----------------\n";
+	cout << BigIntConverter::byteToString(result, true) + "\n";
+	cout << "=================\n";
 }

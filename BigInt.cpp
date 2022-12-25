@@ -39,11 +39,14 @@ void shiftOneByte(BigInt* number)
 	}
 }
 
-void addByte(BigInt* number, byte newByte)
+void addByte(BigInt* number, int amount)
 {
-	number->byteCount++;
+	int idx = number->byteCount;
+	number->byteCount += amount;
 	number->bytes = (byte*)realloc(number->bytes, number->byteCount);
-	number->bytes[number->byteCount - 1] = newByte;
+
+	for (int i = 0; i < amount; i++)
+		number->bytes[idx + i] = 0b00000000;
 }
 
 BigInt operator+(BigInt a, BigInt b)
@@ -55,8 +58,10 @@ BigInt operator+(BigInt a, BigInt b)
 	{
 		// Lấy số có kích thước byte ít hơn và cấp phát thêm vùng nhớ
 		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
-		addByte(lesserByteNumber, 0b00000000);
+		addByte(lesserByteNumber, abs(a.byteCount - b.byteCount));
 	}
+
+	BigIntIO::displayInputs(a, b);
 
 	// Nếu cả hai số đều có bit đầu là 1 thì tăng số byte của kết quả lên 1
 	int resultByteCount = maxByteCount + (getFirstBit(a) || getFirstBit(b));
@@ -68,7 +73,7 @@ BigInt operator+(BigInt a, BigInt b)
 
 	// Nếu tổng hai byte có giá trị lớn hơn 255
 	// thì cần phải nhớ 1
-	bool carry = a.bytes[0] + b.bytes[0] > 255;
+	bool carry = a.bytes[0] + b.bytes[0] > 255 ? 1 : 0;
 	result.bytes[0] = a.bytes[0] + b.bytes[0];
 
 	for (int i = 1; i < maxByteCount; i++) {
@@ -80,9 +85,7 @@ BigInt operator+(BigInt a, BigInt b)
 	}
 
 	if (carry)
-	{
 		result.bytes[result.byteCount - 1] += 1;
-	}
 
 	return result;
 }
