@@ -2,30 +2,17 @@
 #include "BigIntConverter.h"
 #include "BigIntIO.h"
 
-int maxByte(int a, int b)
+int getMaxByteCount(int a, int b)
 {
 	return a > b ? a : b;
 }
 
-byte getLastByte(BigInt number)
+byte getLastByte(const BigInt* number)
 {
-	return number.bytes[number.byteCount - 1];
+	return number->bytes[number->byteCount - 1];
 }
 
-bool getFirstBit(BigInt number)
-{
-	byte lastByte = getLastByte(number);
-	return lastByte & ByteMask[7];
-}
-
-void shiftByte(BigInt number)
-{
-	for (int i = 0; i < number.byteCount; i++)
-	{
-	}
-}
-
-void shiftOneByte(BigInt* number)
+void shiftOneByte(const BigInt* number)
 {
 	try {
 		for (int i = number->byteCount - 1; i > 0; i--)
@@ -35,23 +22,25 @@ void shiftOneByte(BigInt* number)
 	}
 	catch (exception e)
 	{
-		cout << e.what() << endl;
+		cout << e.what() << "\n";
 	}
 }
 
-void addByte(BigInt* number, int amount)
+void addPaddingBytes(BigInt* number, int amount)
 {
-	int idx = number->byteCount;
 	number->byteCount += amount;
 	number->bytes = (byte*)realloc(number->bytes, number->byteCount * sizeof(byte));
 
+	int paddingPosition = number->byteCount - amount;
 	for (int i = 0; i < amount; i++)
-		number->bytes[idx + i] = 0b00000000;
+	{
+		number->bytes[paddingPosition + i] = ByteMask[0];
+	}
 }
 
-void removeLastByteIfNull(BigInt* number)
+void removeLastByte(BigInt* number)
 {
-	byte lastByte = number->bytes[number->byteCount - 1];
+	byte lastByte = getLastByte(number);
 
 	if (lastByte) return;
 	else
@@ -63,25 +52,17 @@ void removeLastByteIfNull(BigInt* number)
 
 BigInt operator+(BigInt a, BigInt b)
 {
-	int maxByteCount = maxByte(a.byteCount, b.byteCount);
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 
 	// Trường hợp hai số có kích thước byte khác nhau
 	if (a.byteCount != b.byteCount)
 	{
-		// Lấy số có kích thước byte ít hơn và cấp phát thêm vùng nhớ
+		// Lấy số có kích thước byte ít hơn để chèn thêm các byte 0
 		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
-		addByte(lesserByteNumber, abs(a.byteCount - b.byteCount));
+		addPaddingBytes(lesserByteNumber, abs((int)a.byteCount - (int)b.byteCount));
 	}
 
-	BigIntIO::displayInputs(a, b, "+");
-
-	// Nếu cả hai số đều có bit đầu là 1 thì tăng số byte của kết quả lên 1
-	int resultByteCount = maxByteCount + (getFirstBit(a) || getFirstBit(b));
-
-	BigInt result;
-	result.byteCount = resultByteCount;
-	result.bytes = (byte*)malloc(result.byteCount * sizeof(byte));
-	memset(result.bytes, 0, result.byteCount);
+	BigInt result(maxByteCount + 1);
 
 	// Nếu tổng hai byte có giá trị lớn hơn 255
 	// thì cần phải nhớ 1
@@ -96,10 +77,16 @@ BigInt operator+(BigInt a, BigInt b)
 		carry = (a.bytes[i] + b.bytes[i] + (carry ? 1 : 0)) > 255;
 	}
 
+	// Nếu sau khi tính toán mà vẫn còn carry thì cộng vào byte cuối cùng
 	if (carry)
+	{
 		result.bytes[result.byteCount - 1] += 1;
-
-	removeLastByteIfNull(&result);
+	}
+	// Trường hợp ngược lại, xóa byte cuối cùng do rỗng
+	else
+	{
+		removeLastByte(&result);
+	}
 
 	return result;
 }
@@ -108,10 +95,7 @@ BigInt operator+(BigInt a, int value)
 {
 	BigInt b(value);
 
-	BigInt result;
-	result.byteCount = a.byteCount;
-	result.bytes = (byte*)malloc(result.byteCount * sizeof(byte));
-	memset(result.bytes, 0, result.byteCount);
+	BigInt result(a.byteCount);
 
 	result = a + b;
 
@@ -122,6 +106,7 @@ void twoComplement(BigInt& number)
 {
 	for (int i = 0; i < number.byteCount; i++)
 	{
+		// Lật bit
 		number.bytes[i] = ~number.bytes[i];
 	}
 
@@ -130,7 +115,7 @@ void twoComplement(BigInt& number)
 
 BigInt operator-(BigInt a, BigInt b)
 {
-	int maxByteCount = maxByte(a.byteCount, b.byteCount);
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 
 	twoComplement(b);
 
@@ -139,13 +124,10 @@ BigInt operator-(BigInt a, BigInt b)
 	{
 		// Lấy số có kích thước byte ít hơn và cấp phát thêm vùng nhớ
 		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
-		addByte(lesserByteNumber, abs(a.byteCount - b.byteCount));
+		addPaddingBytes(lesserByteNumber, abs((int)a.byteCount - (int)b.byteCount));
 	}
 
-	BigInt result;
-	result.byteCount = maxByteCount;
-	result.bytes = (byte*)malloc(result.byteCount * sizeof(byte));
-	memset(result.bytes, 0, result.byteCount);
+	BigInt result(maxByteCount);
 
 	result = a + b;
 

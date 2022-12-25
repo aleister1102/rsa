@@ -6,7 +6,7 @@ class BigIntConverter;
 class BigIntConverter
 {
 public:
-	static string reverseString(string littleEndian);
+	static string reverseString(string str);
 	static string removeSpaces(string str);
 	static byte stringToByte(string str);
 	static string byteToString(byte number, bool isReversed);

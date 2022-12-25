@@ -1,9 +1,9 @@
 #include "BigIntConverter.h"
 
-string BigIntConverter::reverseString(string littleEndian)
+string BigIntConverter::reverseString(string str)
 {
-	reverse(littleEndian.begin(), littleEndian.end());
-	return littleEndian;
+	reverse(str.begin(), str.end());
+	return str;
 }
 
 string BigIntConverter::removeSpaces(string str)

@@ -6,7 +6,8 @@
 using namespace std;
 typedef unsigned char byte;
 
-static byte ByteMask[8] = {
+static byte ByteMask[9] = {
+	0b00000000,
 	0b00000001,
 	0b00000010,
 	0b00000100,
@@ -21,23 +22,33 @@ class BigInt
 {
 public:
 	byte* bytes;
-	int byteCount;
+	uint32_t byteCount;
 
 public:
 	BigInt()
 		: bytes(nullptr), byteCount(0) {}
-	BigInt(int value) // value < 255
-		: bytes(nullptr), byteCount(1) {
+
+	BigInt(int value) {
+		byteCount = 1;
 		bytes = (byte*)malloc(byteCount * sizeof(byte));
-		bytes[0] = value;
+		bytes[0] = value; // value < 255
 	}
+
+	BigInt(uint32_t initByteCount) {
+		byteCount = initByteCount;
+		bytes = (byte*)malloc(byteCount * sizeof(byte));
+		memset(bytes, 0, byteCount);
+	}
+
 	BigInt(byte* bytes, int byteCount)
 		: bytes(bytes), byteCount(byteCount) {}
+
 	BigInt(const BigInt& other)
 		: bytes(nullptr), byteCount(0)
 	{
 		*this = other;
 	}
+
 	~BigInt() { free(bytes); }
 
 public:
