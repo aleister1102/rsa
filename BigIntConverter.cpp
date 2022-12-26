@@ -88,13 +88,13 @@ BigInt BigIntConverter::binaryStrToBigInt(string str)
 	return result;
 }
 
-string BigIntConverter::bigIntToBinaryStr(BigInt* number)
+string BigIntConverter::bigIntToBinaryStr(BigInt number)
 {
 	string result;
 
-	for (int i = number->byteCount - 1; i >= 0; i--)
+	for (int i = number.byteCount - 1; i >= 0; i--)
 	{
-		string str = BigIntConverter::byteToString(number->bytes[i], true);
+		string str = BigIntConverter::byteToString(number.bytes[i], true);
 		result += str + " ";
 	}
 

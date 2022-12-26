@@ -12,20 +12,6 @@ byte getLastByte(const BigInt* number)
 	return number->bytes[number->byteCount - 1];
 }
 
-void shiftOneByte(const BigInt* number)
-{
-	try {
-		for (int i = number->byteCount - 1; i > 0; i--)
-		{
-			number->bytes[i] = number->bytes[i - 1];
-		}
-	}
-	catch (exception e)
-	{
-		cout << e.what() << "\n";
-	}
-}
-
 void addPaddingBytes(BigInt* number, int amount)
 {
 	number->byteCount += amount;
@@ -34,7 +20,7 @@ void addPaddingBytes(BigInt* number, int amount)
 	int paddingPosition = number->byteCount - amount;
 	for (int i = 0; i < amount; i++)
 	{
-		number->bytes[paddingPosition + i] = ByteMask[0];
+		number->bytes[paddingPosition + i] = zero;
 	}
 }
 
@@ -94,7 +80,6 @@ BigInt operator+(BigInt a, BigInt b)
 BigInt operator+(BigInt a, int value)
 {
 	BigInt b(value);
-
 	BigInt result(a.byteCount);
 
 	result = a + b;
@@ -132,4 +117,143 @@ BigInt operator-(BigInt a, BigInt b)
 	result = a + b;
 
 	return result;
+}
+
+BigInt operator-(BigInt a, int value)
+{
+	BigInt b(value);
+	BigInt result(a.byteCount);
+
+	result = a - b;
+
+	return result;
+}
+
+void fillLastBytesWithNull(BigInt* number, int index)
+{
+	for (int i = index; i < number->byteCount; i++)
+	{
+		number->bytes[i] = zero;
+	}
+}
+
+void shiftByteRight(BigInt* number, int distance)
+{
+	for (int i = 0; i < number->byteCount - distance; i++)
+	{
+		number->bytes[i] = number->bytes[i + distance];
+	}
+
+	int lastBytesIndex = number->byteCount - distance;
+	fillLastBytesWithNull(number, lastBytesIndex);
+}
+
+byte getBit(byte number, int index)
+{
+	return (number >> index) & 1;
+}
+
+void copyLowBitsToHighBits(byte a, byte& b, int amount)
+{
+	for (int i = 0; i < amount; i++)
+	{
+		// Lấy ra bit thứ i của a
+		byte ithBit = getBit(a, i);
+
+		// Gán bit đó cho bit thứ 8 - amount + i của b
+		if (ithBit)
+		{
+			b = (1 << (8 - amount + i)) | b;
+		}
+		else {
+			b = (~(1 << (8 - amount + i))) & b;
+		}
+	}
+}
+
+void operator>>(BigInt& number, int steps)
+{
+	int byteDistance = steps / 8;
+	int bitDistance = steps % 8;
+
+	// Dịch byte
+	if (byteDistance)
+	{
+		shiftByteRight(&number, byteDistance);
+	}
+
+	// Dịch bits
+	if (bitDistance) {
+		for (int i = 0; i < number.byteCount; i++)
+		{
+			number.bytes[i] >>= bitDistance;
+
+			if (i < number.byteCount - 1)
+			{
+				copyLowBitsToHighBits(number.bytes[i + 1], number.bytes[i], bitDistance);
+			}
+		}
+	}
+}
+
+void fillFirstBytesWithNull(BigInt* number, int index)
+{
+	for (int i = index; i >= 0; i--)
+	{
+		number->bytes[i] = zero;
+	}
+}
+
+void shiftByteLeft(BigInt* number, int distance)
+{
+	for (int i = number->byteCount - 1; i > distance - 1; i--)
+	{
+		number->bytes[i] = number->bytes[i - distance];
+	}
+
+	int firstBytesIndex = distance - 1;
+	fillFirstBytesWithNull(number, firstBytesIndex);
+}
+
+void copyHighBitsToLowBits(byte a, byte& b, int amount)
+{
+	for (int i = 7; i > 7 - amount; i--)
+	{
+		// Lấy ra bit thứ i của a
+		byte ithBit = getBit(a, i);
+
+		// Gán bit đó cho bit thứ i + amount - 8 của b
+		if (ithBit)
+		{
+			b = (1 << (i + amount - 8)) | b;
+		}
+		else {
+			b = (~(1 << (i + amount - 8))) & b;
+		}
+	}
+}
+
+void operator<<(BigInt& number, int steps)
+{
+	int byteDistance = steps / 8;
+	int bitDistance = steps % 8;
+
+	// Dịch byte
+	if (byteDistance)
+	{
+		shiftByteLeft(&number, byteDistance);
+	}
+
+	// Dịch bits
+	if (bitDistance) {
+		for (int i = number.byteCount - 1; i >= 0; i--)
+		{
+			number.bytes[i] <<= bitDistance;
+
+			if (i > 0)
+			{
+				copyHighBitsToLowBits(number.bytes[i - 1], number.bytes[i], bitDistance);
+			}
+		}
+	}
 }
