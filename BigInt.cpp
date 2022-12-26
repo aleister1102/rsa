@@ -2,7 +2,7 @@
 #include "BigIntConverter.h"
 #include "BigIntIO.h"
 
-uint32_t getMaxByteCount(int a, int b)
+uint16_t getMaxByteCount(int a, int b)
 {
 	return a > b ? a : b;
 }
@@ -27,6 +27,22 @@ byte getFirstBit(const BigInt* n)
 {
 	byte firstByte = getFirstByte(n);
 	return firstByte & ByteMask[0];
+}
+
+byte getBit(byte number, int index)
+{
+	return (number >> index) & 1;
+}
+
+void setBit(byte& number, int index, byte bit)
+{
+	if (bit)
+	{
+		number = (1 << index) | number;
+	}
+	else {
+		number = (~(1 << index)) & number;
+	}
 }
 
 void addPaddingBytes(BigInt* n, int amount)
@@ -68,7 +84,7 @@ void shareByteCount(BigInt& a, BigInt& b)
 
 BigInt operator+(BigInt a, BigInt b)
 {
-	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint16_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 	BigInt res(maxByteCount + 1); // cấp phát dư 1 byte
 
 	shareByteCount(a, b);
@@ -104,7 +120,7 @@ BigInt operator+(BigInt a, BigInt b)
 BigInt operator+(BigInt a, int value)
 {
 	BigInt result(a.byteCount);
-	BigInt b(value);
+	BigInt b = value;
 
 	result = a + b;
 
@@ -129,7 +145,7 @@ void twoComplement(BigInt& n)
 
 BigInt operator-(BigInt a, BigInt b)
 {
-	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint16_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 	BigInt res(maxByteCount);
 
 	shareByteCount(a, b);
@@ -157,7 +173,7 @@ BigInt operator-(BigInt a, BigInt b)
 BigInt operator-(BigInt a, int value)
 {
 	BigInt res(a.byteCount);
-	BigInt b(value);
+	BigInt b = value;
 
 	res = a - b;
 	return res;
@@ -190,7 +206,7 @@ bool operator==(BigInt a, BigInt b)
 
 bool operator==(BigInt a, int value)
 {
-	BigInt b(value);
+	BigInt b = value;
 
 	return a == b;
 }
@@ -199,20 +215,22 @@ bool operator!=(BigInt a, BigInt b)
 {
 	bool res = !(a == b);
 
-	io.writeOutputs(a, b, res, " != ");
+	//io.writeOutputs(a, b, res, " != ");
 	return res;
 }
 
 bool operator!=(BigInt a, int value)
 {
-	BigInt b(value);
+	BigInt b = value;
 
 	return a != b;
 }
 
-void fillLastBytesWithNull(BigInt* n, int index)
+void fillLastBytesWithNull(BigInt* n, int amount)
 {
-	for (int i = index; i < n->byteCount; i++)
+	int end = n->byteCount < amount ? 0 : n->byteCount - amount;
+
+	for (int i = n->byteCount - 1; i >= end; i--)
 	{
 		n->bytes[i] = ZERO;
 	}
@@ -225,24 +243,7 @@ void shiftByteRight(BigInt* n, int distance)
 		n->bytes[i] = n->bytes[i + distance];
 	}
 
-	int lastBytesIndex = n->byteCount - distance;
-	fillLastBytesWithNull(n, lastBytesIndex);
-}
-
-byte getBit(byte number, int index)
-{
-	return (number >> index) & 1;
-}
-
-void setBit(byte& number, int index, byte bit)
-{
-	if (bit)
-	{
-		number = (1 << index) | number;
-	}
-	else {
-		number = (~(1 << index)) & number;
-	}
+	fillLastBytesWithNull(n, distance);
 }
 
 void copyLowBitsToHighBits(byte& a, byte& b, int amount)
@@ -257,47 +258,41 @@ void copyLowBitsToHighBits(byte& a, byte& b, int amount)
 	}
 }
 
-BigInt operator>>(BigInt& number, int steps)
+BigInt operator>>(BigInt n, int steps)
 {
 	int byteDistance = steps / 8;
 	int bitDistance = steps % 8;
+	BigInt res = n;
 
-	// Cấp phát thêm một byte rỗng ở đầu
-	//number.byteCount++;
-	//number.bytes = (byte*)realloc(number.bytes, number.byteCount * sizeof(byte));
-	//number.bytes[number.byteCount - 1] = 0;
-	//shiftByteLeft(&number, 1);
-
-	// Dịch byte
 	if (byteDistance)
 	{
-		shiftByteRight(&number, byteDistance);
+		shiftByteRight(&res, byteDistance);
 	}
 
-	// Dịch bits
 	if (bitDistance) {
-		for (int i = 0; i < number.byteCount; i++)
+		for (int i = 0; i < res.byteCount; i++)
 		{
-			number.bytes[i] >>= bitDistance;
+			res.bytes[i] >>= bitDistance;
 
-			if (i < number.byteCount - 1)
+			if (i < res.byteCount - 1)
 			{
-				copyLowBitsToHighBits(number.bytes[i + 1], number.bytes[i], bitDistance);
+				copyLowBitsToHighBits(res.bytes[i + 1], res.bytes[i], bitDistance);
 			}
 		}
 	}
 
-	//removeLastByte(&number);
-	return number;
+	//io.writeOutputs(n, steps, res, " >> ");
+	return res;
 }
 
 void operator >>= (BigInt& number, int steps) {
 	number = number >> steps;
 }
 
-void fillFirstBytesWithNull(BigInt* number, int index)
+void fillFirstBytesWithNull(BigInt* number, int amount)
 {
-	for (int i = index; i >= 0; i--)
+	int end = number->byteCount < amount ? number->byteCount : amount;
+	for (int i = 0; i < end; i++)
 	{
 		number->bytes[i] = ZERO;
 	}
@@ -305,13 +300,12 @@ void fillFirstBytesWithNull(BigInt* number, int index)
 
 void shiftByteLeft(BigInt* number, int distance)
 {
-	for (int i = number->byteCount - 1; i > distance - 1; i--)
+	for (int i = number->byteCount - 1; i >= distance - 1; i--)
 	{
 		number->bytes[i] = number->bytes[i - distance];
 	}
 
-	int firstBytesIndex = distance - 1;
-	fillFirstBytesWithNull(number, firstBytesIndex);
+	fillFirstBytesWithNull(number, distance);
 }
 
 void copyHighBitsToLowBits(byte a, byte& b, int amount)
@@ -326,36 +320,31 @@ void copyHighBitsToLowBits(byte a, byte& b, int amount)
 	}
 }
 
-BigInt operator<<(BigInt& number, int steps)
+BigInt operator<<(BigInt n, int steps)
 {
 	int byteDistance = steps / 8;
 	int bitDistance = steps % 8;
+	BigInt res = n;
 
-	// Cấp phát thêm một byte rỗng ở cuối
-	//number.byteCount++;
-	//number.bytes = (byte*)realloc(number.bytes, number.byteCount * sizeof(byte));
-	//number.bytes[number.byteCount - 1] = 0;
-
-	// Dịch byte
 	if (byteDistance)
 	{
-		shiftByteLeft(&number, byteDistance);
+		shiftByteLeft(&res, byteDistance);
 	}
 
-	// Dịch bits
 	if (bitDistance) {
-		for (int i = number.byteCount - 1; i >= 0; i--)
+		for (int i = res.byteCount - 1; i >= 0; i--)
 		{
-			number.bytes[i] <<= bitDistance;
+			res.bytes[i] <<= bitDistance;
 
 			if (i > 0)
 			{
-				copyHighBitsToLowBits(number.bytes[i - 1], number.bytes[i], bitDistance);
+				copyHighBitsToLowBits(res.bytes[i - 1], res.bytes[i], bitDistance);
 			}
 		}
 	}
 
-	return number;
+	io.writeOutputs(n, steps, res, " << ");
+	return res;
 }
 
 void operator<<=(BigInt& number, int steps)
@@ -364,7 +353,7 @@ void operator<<=(BigInt& number, int steps)
 }
 
 BigInt operator &(BigInt a, BigInt b) {
-	uint32_t sharedByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint16_t sharedByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 
 	// Trường hợp hai số có kích thước byte khác nhau
 	if (a.byteCount != b.byteCount)
@@ -386,7 +375,7 @@ BigInt operator &(BigInt a, BigInt b) {
 
 BigInt operator |(BigInt a, BigInt b)
 {
-	uint32_t sharedByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint16_t sharedByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 
 	// Trường hợp hai số có kích thước byte khác nhau
 	if (a.byteCount != b.byteCount)
@@ -422,8 +411,8 @@ BigInt operator*(BigInt a, BigInt b)
 		else
 			result += 0;
 
-		b >>= 1;
-		a <<= 1;
+		//b >>= 1;
+		//a <<= 1;
 
 		// Nếu đã dời hết một octet (7 lần)
 		// thì cấp phát thêm cho a một byte nữa
@@ -458,7 +447,7 @@ BigInt operator/(BigInt a, BigInt b)
 {
 	io.displayInputs(a, b, "/");
 
-	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint16_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 
 	BigInt r(maxByteCount);
 	int k = b.byteCount * 8;

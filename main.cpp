@@ -37,18 +37,13 @@ void clearOutputs()
 // Triển khai các thao tác
 void test(BigInt a, BigInt b)
 {
+	a << 5;
+#if 0
 	a + b;
 	a - b;
 	a == b;
 	a != b;
-#if 0
-	BigInt different = a - b;
-	cout << "Result: \n" << io.outputBin(different) << "\n";
-
-	cout << io.outputBin(a) << endl;
-	a << 6;
-	cout << io.outputBin(a) << endl;
-
+	a >> 10;
 	BigInt product = a * b;
 	cout << "Result: \n" << io.outputBin(product) << "\n";
 

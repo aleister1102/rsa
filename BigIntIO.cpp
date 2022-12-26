@@ -32,3 +32,10 @@ void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt result, string op)
 	f << io.outputBin(a) << op << io.outputBin(b) << " = " << io.outputBin(result) << endl;
 	f.close();
 }
+
+void BigIntIO::writeOutputs(BigInt a, int b, BigInt result, string op)
+{
+	fstream f("output.txt", ios::app);
+	f << io.outputBin(a) << op << b << " = " << io.outputBin(result) << endl;
+	f.close();
+}
