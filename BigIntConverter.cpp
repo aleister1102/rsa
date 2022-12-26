@@ -69,6 +69,7 @@ BigInt BigIntConverter::binaryStrToBigInt(string str)
 
 		try
 		{
+			// Tách các byte từ phải qua
 			if (length - 8 >= 0)
 				byteStr = str.substr(offset - 8, 8);
 			else

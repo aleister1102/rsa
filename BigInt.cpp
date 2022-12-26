@@ -1,98 +1,100 @@
-#include "BigInt.h"
+#include "BigInt.h";
 #include "BigIntConverter.h"
 #include "BigIntIO.h"
 
-int getMaxByteCount(int a, int b)
+uint32_t getMaxByteCount(int a, int b)
 {
 	return a > b ? a : b;
 }
 
-byte getLastByte(const BigInt* number)
+byte getLastByte(const BigInt* n)
 {
-	return number->bytes[number->byteCount - 1];
+	return n->bytes[n->byteCount - 1];
 }
 
-byte getLastBit(const BigInt* number)
+byte getFirstByte(const BigInt* n)
 {
-	byte lastByte = getLastByte(number);
+	return n->bytes[0];
+}
+
+byte getLastBit(const BigInt* n)
+{
+	byte lastByte = getLastByte(n);
 	return lastByte & ByteMask[7];
 }
 
-byte getFirstBit(const BigInt* number)
+byte getFirstBit(const BigInt* n)
 {
-	byte firstByte = number->bytes[0];
+	byte firstByte = getFirstByte(n);
 	return firstByte & ByteMask[0];
 }
 
-void addPaddingBytes(BigInt* number, int amount)
+void addPaddingBytes(BigInt* n, int amount)
 {
-	number->byteCount += amount;
-	number->bytes = (byte*)realloc(number->bytes, number->byteCount * sizeof(byte));
+	n->byteCount += amount;
+	auto newMem = (byte*)realloc(n->bytes, n->byteCount * sizeof(byte));
+	n->bytes = newMem ? newMem : nullptr;
 
-	int paddingPosition = number->byteCount - amount;
+	int paddingPosition = n->byteCount - amount;
 	for (int i = 0; i < amount; i++)
 	{
-		number->bytes[paddingPosition + i] = zero;
+		if (n->bytes)
+			n->bytes[paddingPosition + i] = ZERO;
 	}
 }
 
-void removeLastByte(BigInt* number)
+void removeLastByteIfNull(BigInt* n, bool checkNull = true)
 {
-	byte lastByte = getLastByte(number);
+	byte lastByte = getLastByte(n);
 
-	if (lastByte) return;
-	else
+	if (checkNull && lastByte == 0)
 	{
-		number->byteCount -= 1;
-		number->bytes = (byte*)realloc(number->bytes, number->byteCount * sizeof(byte));
+		n->byteCount -= 1;
+		auto newMem = (byte*)realloc(n->bytes, n->byteCount * sizeof(byte));
+		n->bytes = newMem ? newMem : nullptr;
+	}
+}
+
+void shareByteCount(BigInt& a, BigInt& b)
+{
+	// Trường hợp hai số có kích thước byte khác nhau
+	if (a.byteCount != b.byteCount)
+	{
+		// Lấy số có kích thước byte ít hơn và cấp phát thêm vùng nhớ
+		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
+		addPaddingBytes(lesserByteNumber, abs((int)a.byteCount - (int)b.byteCount));
 	}
 }
 
 BigInt operator+(BigInt a, BigInt b)
 {
 	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	BigInt res(maxByteCount);
 
-	// Trường hợp hai số có kích thước byte khác nhau
-	if (a.byteCount != b.byteCount)
-	{
-		// Lấy số có kích thước byte ít hơn để chèn thêm các byte 0
-		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
-		addPaddingBytes(lesserByteNumber, abs((int)a.byteCount - (int)b.byteCount));
-	}
-
-	BigInt result(maxByteCount + 1);
+	shareByteCount(a, b);
 
 	// Nếu tổng hai byte có giá trị lớn hơn 255
 	// thì cần phải nhớ 1
 	bool carry = a.bytes[0] + b.bytes[0] > 255 ? 1 : 0;
-	result.bytes[0] = a.bytes[0] + b.bytes[0];
+	res.bytes[0] = a.bytes[0] + b.bytes[0];
 
 	for (int i = 1; i < maxByteCount; i++) {
-		result.bytes[i] = a.bytes[i] + b.bytes[i] + (carry ? 1 : 0);
+		res.bytes[i] = a.bytes[i] + b.bytes[i] + (carry ? 1 : 0);
 
 		// Nếu tổng hai byte và nhớ một ở byte trước cũng lớn hơn 255
-		// thì nhớ 1 sang byte tiếp theo
+		// thì nhớ 1 sang byte tiếp theo55
 		carry = (a.bytes[i] + b.bytes[i] + (carry ? 1 : 0)) > 255;
 	}
 
-	// Nếu sau khi tính toán mà vẫn còn carry thì cộng vào byte cuối cùng
-	if (carry)
-	{
-		result.bytes[result.byteCount - 1] += 1;
-	}
-	// Trường hợp ngược lại, xóa byte cuối cùng do rỗng
-	else
-	{
-		removeLastByte(&result);
-	}
+	//io.writeOutputs(a, b, res, " + ");
 
-	return result;
+	return res;
 }
 
 BigInt operator+(BigInt a, int value)
 {
-	BigInt b(value);
 	BigInt result(a.byteCount);
+	BigInt b(value);
 
 	result = a + b;
 
@@ -104,68 +106,51 @@ void operator+=(BigInt& a, BigInt b)
 	a = a + b;
 }
 
-void twoComplement(BigInt& number)
+void twoComplement(BigInt& n)
 {
-	for (int i = 0; i < number.byteCount; i++)
+	for (int i = 0; i < n.byteCount; i++)
 	{
 		// Lật bit
-		number.bytes[i] = ~number.bytes[i];
+		n.bytes[i] = ~n.bytes[i];
 	}
 
-	number = number + 1;
+	n = n + 1;
 }
 
 BigInt operator-(BigInt a, BigInt b)
 {
 	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	BigInt res(maxByteCount);
 
-	//BigIntIO::displayInputs(a, b, "-");
+	shareByteCount(a, b);
 
-	// Trường hợp hai số có kích thước byte khác nhau
-	if (a.byteCount != b.byteCount)
-	{
-		// Lấy số có kích thước byte ít hơn và cấp phát thêm vùng nhớ
-		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
-		addPaddingBytes(lesserByteNumber, abs((int)a.byteCount - (int)b.byteCount));
-	}
-
-	BigInt result(maxByteCount);
-
+	// Cách 1: trừ từng byte
+	//
 	// Nếu hiệu hai byte có giá trị nhỏ hơn 0
 	// thì cần phải mượn 1
-	bool borrow = a.bytes[0] - b.bytes[0] < 0 ? 1 : 0;
-	result.bytes[0] = a.bytes[0] - b.bytes[0];
+	bool borrow = (a.bytes[0] - b.bytes[0] < 0) ? 1 : 0;
+	res.bytes[0] = a.bytes[0] - b.bytes[0];
 
 	for (int i = 1; i < maxByteCount; i++) {
-		result.bytes[i] = a.bytes[i] - b.bytes[i] - (borrow ? 1 : 0);
+		res.bytes[i] = a.bytes[i] - b.bytes[i] - (borrow ? 1 : 0);
 
 		// Nếu hiệu hai byte và mượn 1 ở byte trước cũng nhỏ hơn 0
 		// thì mượn của byte tiếp theo
 		borrow = (a.bytes[i] - b.bytes[i] - (borrow ? 1 : 0)) < 0;
 	}
 
-	// Nếu sau khi tính toán mà vẫn còn borrow thì trừ 1 vào byte cuối cùng
-	if (borrow)
-	{
-		result.bytes[result.byteCount - 1] -= 1;
-	}
-	// Trường hợp ngược lại, xóa byte cuối cùng do rỗng
-	else
-	{
-		removeLastByte(&result);
-	}
+	//io.writeOutputs(a, b, res, " - ");
 
-	return result;
+	return res;
 }
 
 BigInt operator-(BigInt a, int value)
 {
+	BigInt res(a.byteCount);
 	BigInt b(value);
-	BigInt result(a.byteCount);
 
-	result = a - b;
-
-	return result;
+	res = a - b;
+	return res;
 }
 
 void operator-=(BigInt& a, BigInt b)
@@ -175,12 +160,7 @@ void operator-=(BigInt& a, BigInt b)
 
 bool operator==(BigInt a, BigInt b)
 {
-	//cout << "Compare " << BigIntConverter::bigIntToBinaryStr(a) << " with "
-		//<< BigIntConverter::bigIntToBinaryStr(b) << endl;
-
 	BigInt difference = a - b;
-
-	//cout << "The difference: " << BigIntConverter::bigIntToBinaryStr(difference) << endl;
 
 	for (int i = 0; i < difference.byteCount; i++)
 	{
@@ -222,7 +202,7 @@ void fillLastBytesWithNull(BigInt* number, int index)
 {
 	for (int i = index; i < number->byteCount; i++)
 	{
-		number->bytes[i] = zero;
+		number->bytes[i] = ZERO;
 	}
 }
 
@@ -242,7 +222,18 @@ byte getBit(byte number, int index)
 	return (number >> index) & 1;
 }
 
-void copyLowBitsToHighBits(byte a, byte& b, int amount)
+void setBit(byte& number, int index, byte bit)
+{
+	if (bit)
+	{
+		number = (1 << index) | number;
+	}
+	else {
+		number = (~(1 << index)) & number;
+	}
+}
+
+void copyLowBitsToHighBits(byte& a, byte& b, int amount)
 {
 	for (int i = 0; i < amount; i++)
 	{
@@ -250,13 +241,7 @@ void copyLowBitsToHighBits(byte a, byte& b, int amount)
 		byte ithBit = getBit(a, i);
 
 		// Gán bit đó cho bit thứ 8 - amount + i của b
-		if (ithBit)
-		{
-			b = (1 << (8 - amount + i)) | b;
-		}
-		else {
-			b = (~(1 << (8 - amount + i))) & b;
-		}
+		setBit(b, 8 - amount + i, ithBit);
 	}
 }
 
@@ -302,7 +287,7 @@ void fillFirstBytesWithNull(BigInt* number, int index)
 {
 	for (int i = index; i >= 0; i--)
 	{
-		number->bytes[i] = zero;
+		number->bytes[i] = ZERO;
 	}
 }
 
@@ -325,13 +310,7 @@ void copyHighBitsToLowBits(byte a, byte& b, int amount)
 		byte ithBit = getBit(a, i);
 
 		// Gán bit đó cho bit thứ i + amount - 8 của b
-		if (ithBit)
-		{
-			b = (1 << (i + amount - 8)) | b;
-		}
-		else {
-			b = (~(1 << (i + amount - 8))) & b;
-		}
+		setBit(b, i + amount - 8, ithBit);
 	}
 }
 
@@ -417,17 +396,19 @@ BigInt operator |(BigInt a, BigInt b)
 
 BigInt operator*(BigInt a, BigInt b)
 {
-	BigInt result(0);
+	io.displayInputs(a, b, "*");
 
-	BigIntIO::displayInputs(a, b, "*");
+	BigInt result(0);
 
 	int k = 0;
 	while (b != 0)
 	{
 		byte firstBit = getFirstBit(&b);
-		BigInt add = firstBit == 1 ? a : 0;
 
-		result += add;
+		if (firstBit)
+			result += a;
+		else
+			result += 0;
 
 		b >>= 1;
 		a <<= 1;
@@ -442,4 +423,75 @@ BigInt operator*(BigInt a, BigInt b)
 	}
 
 	return result;
+}
+
+uint16_t getBitCount(const BigInt* bigInt) {
+	uint16_t bitCount = (bigInt->byteCount * 8);
+
+	for (int i = 7; i >= 0; i--) {
+		if (getBit(bigInt->bytes[bigInt->byteCount - 1], i) == 1) break;
+		bitCount--;
 	}
+	return bitCount;
+}
+
+bool isLesserThanZero(const BigInt* number)
+{
+	byte lastBit = getLastBit(number);
+	bool result = lastBit == 0 ? false : true;
+	return result;
+}
+
+BigInt operator/(BigInt a, BigInt b)
+{
+	io.displayInputs(a, b, "/");
+
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+
+	BigInt r(maxByteCount);
+	int k = b.byteCount * 8;
+
+	while (k > 0)
+	{
+		// Dịch trái chuỗi [r, a]
+
+		// Lấy bit cuối của a
+		byte lastBitA = getLastBit(&a);
+
+		//cout << "Before shift: " <<
+		//	io.outputBin(r) << " " <<
+		//	io.outputBin(a) << endl;
+
+		a << 1;
+		r << 1;
+
+		// Gán cho bit đầu của r
+		setBit(r.bytes[0], 0, lastBitA);
+
+		cout << "After shift: " <<
+			io.outputBin(r) << " " <<
+			io.outputBin(a) << endl;
+
+		r -= b;
+		cout << "After subtract: " << io.outputBin(r) << endl;
+
+		// Nếu r < 0
+		if (isLesserThanZero(&r))
+		{
+			// Khôi phục r và gán bit đầu của a là 0
+			r += b;
+			setBit(a.bytes[0], 0, 0);
+
+			cout << "Restore: " << io.outputBin(r) << endl;
+		}
+		else
+		{
+			// Gán bit đầu của a là 1
+			setBit(a.bytes[0], 0, 1);
+		}
+
+		k -= 1;
+	}
+
+	return a;
+}

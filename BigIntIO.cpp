@@ -1,10 +1,11 @@
 #include "BigIntIO.h"
+#include <fstream>
 
 BigInt BigIntIO::inputBin(string binaryString)
 {
 	BigInt result;
 
-	result = BigIntConverter::binaryStrToBigInt(binaryString);
+	result = converter.binaryStrToBigInt(binaryString);
 
 	return result;
 }
@@ -12,7 +13,7 @@ string BigIntIO::outputBin(BigInt number)
 {
 	string result;
 
-	result = BigIntConverter::bigIntToBinaryStr(number);
+	result = converter.bigIntToBinaryStr(number);
 
 	return result;
 }
@@ -20,16 +21,14 @@ string BigIntIO::outputBin(BigInt number)
 void BigIntIO::displayInputs(BigInt a, BigInt b, string op)
 {
 	cout << "Input for " << op << "\n";
-	cout << BigIntConverter::bigIntToBinaryStr(a) << endl;
-	cout << BigIntConverter::bigIntToBinaryStr(b) << endl;
+	cout << converter.bigIntToBinaryStr(a) << endl;
+	cout << converter.bigIntToBinaryStr(b) << endl;
 	cout << "\n";
 }
 
-void BigIntIO::testOperatorForByte(byte a, byte b, byte result, string op)
+void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt result, string op)
 {
-	cout << BigIntConverter::byteToString(a, true) << "\n " << op << " \n";
-	cout << BigIntConverter::byteToString(b, true) << "\n";
-	cout << "-----------------\n";
-	cout << BigIntConverter::byteToString(result, true) + "\n";
-	cout << "=================\n";
+	fstream f("output.txt", ios::app);
+	f << io.outputBin(a) << op << io.outputBin(b) << " = " << io.outputBin(result) << endl;
+	f.close();
 }
