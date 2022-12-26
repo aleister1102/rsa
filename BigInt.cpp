@@ -43,11 +43,11 @@ void addPaddingBytes(BigInt* n, int amount)
 	}
 }
 
-void removeLastByteIfNull(BigInt* n, bool checkNull = true)
+void removeLastByteIfNull(BigInt* n)
 {
 	byte lastByte = getLastByte(n);
 
-	if (checkNull && lastByte == 0)
+	if (lastByte == 0)
 	{
 		n->byteCount -= 1;
 		auto newMem = (byte*)realloc(n->bytes, n->byteCount * sizeof(byte));
@@ -69,7 +69,7 @@ void shareByteCount(BigInt& a, BigInt& b)
 BigInt operator+(BigInt a, BigInt b)
 {
 	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
-	BigInt res(maxByteCount);
+	BigInt res(maxByteCount + 1); // cấp phát dư 1 byte
 
 	shareByteCount(a, b);
 
@@ -85,6 +85,16 @@ BigInt operator+(BigInt a, BigInt b)
 		// thì nhớ 1 sang byte tiếp theo55
 		carry = (a.bytes[i] + b.bytes[i] + (carry ? 1 : 0)) > 255;
 	}
+
+	// Nếu sau khi cộng tất cả các byte mà vẫn còn nhớ
+	// thì cộng sang byte dư ra
+	if (carry)
+	{
+		res.bytes[res.byteCount - 1] += 1;
+	}
+
+	// Kiểm tra nếu byte dư ra là rỗng thì xóa
+	removeLastByteIfNull(&res);
 
 	//io.writeOutputs(a, b, res, " + ");
 
@@ -160,15 +170,22 @@ void operator-=(BigInt& a, BigInt b)
 
 bool operator==(BigInt a, BigInt b)
 {
+	// Kiểm tra xem hiệu của hai số có khác 0 hay không
 	BigInt difference = a - b;
+	bool res = true;
 
 	for (int i = 0; i < difference.byteCount; i++)
 	{
 		if (difference.bytes[i] != 0)
-			return false;
+		{
+			res = false;
+			break;
+		}
 	}
 
-	return true;
+	//io.writeOutputs(a, b, res, " == ");
+
+	return res;
 }
 
 bool operator==(BigInt a, int value)
@@ -180,15 +197,10 @@ bool operator==(BigInt a, int value)
 
 bool operator!=(BigInt a, BigInt b)
 {
-	BigInt difference = a - b;
+	bool res = !(a == b);
 
-	for (int i = 0; i < difference.byteCount; i++)
-	{
-		if (difference.bytes[i] != 0)
-			return true;
-	}
-
-	return false;
+	io.writeOutputs(a, b, res, " != ");
+	return res;
 }
 
 bool operator!=(BigInt a, int value)
@@ -198,23 +210,23 @@ bool operator!=(BigInt a, int value)
 	return a != b;
 }
 
-void fillLastBytesWithNull(BigInt* number, int index)
+void fillLastBytesWithNull(BigInt* n, int index)
 {
-	for (int i = index; i < number->byteCount; i++)
+	for (int i = index; i < n->byteCount; i++)
 	{
-		number->bytes[i] = ZERO;
+		n->bytes[i] = ZERO;
 	}
 }
 
-void shiftByteRight(BigInt* number, int distance)
+void shiftByteRight(BigInt* n, int distance)
 {
-	for (int i = 0; i < number->byteCount - distance; i++)
+	for (int i = 0; i < n->byteCount - distance; i++)
 	{
-		number->bytes[i] = number->bytes[i + distance];
+		n->bytes[i] = n->bytes[i + distance];
 	}
 
-	int lastBytesIndex = number->byteCount - distance;
-	fillLastBytesWithNull(number, lastBytesIndex);
+	int lastBytesIndex = n->byteCount - distance;
+	fillLastBytesWithNull(n, lastBytesIndex);
 }
 
 byte getBit(byte number, int index)

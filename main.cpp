@@ -34,13 +34,13 @@ void clearOutputs()
 	f.close();
 }
 
+// Triển khai các thao tác
 void test(BigInt a, BigInt b)
 {
-	BigInt res;
-
-	// Triển khai các thao tác
-	res = a + b;
-	res = a - b;
+	a + b;
+	a - b;
+	a == b;
+	a != b;
 #if 0
 	BigInt different = a - b;
 	cout << "Result: \n" << io.outputBin(different) << "\n";
