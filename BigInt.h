@@ -103,7 +103,30 @@ public:
 
 BigInt operator + (BigInt a, BigInt b);
 BigInt operator + (BigInt a, int value);
+
+void operator +=(BigInt& a, BigInt b);
+
 BigInt operator - (BigInt a, BigInt b);
 BigInt operator - (BigInt a, int value);
-void operator >> (BigInt& a, int steps);
-void operator << (BigInt& a, int steps);
+
+void operator -=(BigInt& a, BigInt b);
+
+bool operator == (BigInt a, BigInt b);
+bool operator == (BigInt a, int value);
+
+bool operator != (BigInt a, BigInt b);
+bool operator != (BigInt a, int value);
+
+BigInt operator >> (BigInt& a, int steps);
+void operator >>= (BigInt& a, int steps);
+
+BigInt operator << (BigInt& a, int steps);
+void operator <<= (BigInt& a, int steps);
+
+BigInt operator &(BigInt a, BigInt b);
+
+BigInt operator |(BigInt a, BigInt b);
+
+BigInt operator *(BigInt a, BigInt b);
+
+void shiftByteLeft(BigInt* number, int distance);

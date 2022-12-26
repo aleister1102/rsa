@@ -15,22 +15,22 @@ int main()
 	f.close();
 
 	BigInt a = BigIntIO::inputBin(numberA);
+	BigInt b = BigIntIO::inputBin(numberB);
+
+#if 0
+	BigInt different = a - b;
+	cout << "Result: \n" << BigIntIO::outputBin(different) << "\n";
+
+	BigInt sum = a + b;
+	cout << "Result: \n" << BigIntIO::outputBin(sum) << "\n";
+
+	cout << BigIntIO::outputBin(a) << endl;
+	a << 6;
 	cout << BigIntIO::outputBin(a) << endl;
 
-	//BigInt b = BigIntIO::inputBin(numberB);
-	//cout << BigIntIO::outputBin(b) << endl;
-
-	//BigInt sum = a + b;
-	//cout << "Result: \n" << BigIntIO::outputBin(&sum) << "\n";
-
-	//BigInt different = a - b;
-	//cout << "Result: \n" << BigIntIO::outputBin(&different) << "\n";
-
-	a >> 3;
-	cout << BigIntIO::outputBin(a) << endl;
-
-	a << 3;
-	cout << BigIntIO::outputBin(a) << endl;
+#endif
+	BigInt product = a * b;
+	cout << "Result: \n" << BigIntIO::outputBin(product) << "\n";
 
 	return 0;
 }
