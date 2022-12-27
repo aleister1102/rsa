@@ -2,7 +2,7 @@
 #include "BigIntConverter.h"
 #include "BigIntIO.h"
 
-uint32_t getMaxByteCount(int a, int b)
+uint32_t getMaxByteCount(uint32_t a, uint32_t b)
 {
 	return a > b ? a : b;
 }
@@ -57,8 +57,11 @@ bool BigInt::isEven()
 
 bool BigInt::isZero()
 {
+	BigInt temp = *this;
+	removeLastBytesIfNull(temp);
+
 	bool res = false;
-	if (this->byteCount == 1 && bytes[0] == 0)
+	if (temp.byteCount == 1 && temp.bytes[0] == 0)
 		res = true;
 	return res;
 }
@@ -95,15 +98,15 @@ void addMoreBytes(BigInt& n, int amount)
 	for (int i = 0; i < amount; i++)
 	{
 		if (n.bytes)
-			n.bytes[paddingPosition + i] = ZERO;
+			n.bytes[paddingPosition + i] = 0;
 	}
 }
 
-void removeLastBytesIfNull(BigInt& n)
+void removeLastBytesIfNull(BigInt& n, int preserve)
 {
 	byte lastByte = getLastByte(n);
 
-	while (lastByte == 0 && n.byteCount > 1)
+	while (lastByte == 0 && n.byteCount > preserve) // preserve là số byte tối thiểu được phép giữ lại
 	{
 		n.byteCount -= 1;
 		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
@@ -123,15 +126,47 @@ void removeLastBytes(BigInt& n, uint32_t amount)
 	}
 }
 
-void shareByteCount(BigInt& a, BigInt& b)
+void fillLastBytesWithNull(BigInt& n, int amount)
 {
+	int end = n.byteCount < amount ? 0 : n.byteCount - amount;
+
+	for (int i = n.byteCount - 1; i >= end; i--)
+	{
+		n.bytes[i] = 0;
+	}
+}
+
+void fillFirstBytesWithNull(BigInt& n, int amount)
+{
+	int end = n.byteCount < amount ? n.byteCount : amount;
+	for (int i = 0; i < end; i++)
+	{
+		n.bytes[i] = 0;
+	}
+}
+
+uint32_t shareByteCount(BigInt& a, BigInt& b)
+{
+	uint32_t extraByteAmount = a.byteCount;
+
 	// Trường hợp hai số có kích thước byte khác nhau
 	if (a.byteCount != b.byteCount)
 	{
 		// Lấy số có kích thước byte ít hơn và cấp phát thêm vùng nhớ
 		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
-		addMoreBytes(*lesserByteNumber, abs((int)a.byteCount - (int)b.byteCount));
+		extraByteAmount = abs((int32_t)a.byteCount - (int32_t)b.byteCount);
+		addMoreBytes(*lesserByteNumber, extraByteAmount);
 	}
+
+	return extraByteAmount;
+}
+
+BigInt twoComplement(BigInt n)
+{
+	if (n.isZero()) return n;
+	BigInt res = ~(n);
+	res += 1;
+	return res;
 }
 
 BigInt operator+(BigInt a, BigInt b)
@@ -161,7 +196,7 @@ BigInt operator+(BigInt a, BigInt b)
 		res.bytes[res.byteCount - 1] += 1;
 	}
 
-	// Kiểm tra nếu byte dư ra là rỗng thì xóa
+	// Xóa byte thừa nếu rỗng
 	removeLastBytesIfNull(res);
 
 	//io.writeOutputs(a, b, res, " + ");
@@ -182,14 +217,6 @@ BigInt operator+(BigInt a, int value)
 void operator+=(BigInt& a, BigInt b)
 {
 	a = a + b;
-}
-
-BigInt twoComplement(BigInt n)
-{
-	if (n.isZero()) return n;
-	BigInt res = ~(n);
-	res += 1;
-	return res;
 }
 
 BigInt operator-(BigInt a, BigInt b)
@@ -278,84 +305,6 @@ bool operator!=(BigInt a, int value)
 	return a != b;
 }
 
-void fillLastBytesWithNull(BigInt& n, int amount)
-{
-	int end = n.byteCount < amount ? 0 : n.byteCount - amount;
-
-	for (int i = n.byteCount - 1; i >= end; i--)
-	{
-		n.bytes[i] = ZERO;
-	}
-}
-
-void shiftByteRight(BigInt& n, int distance)
-{
-	for (int i = 0; i < n.byteCount - distance; i++)
-	{
-		n.bytes[i] = n.bytes[i + distance];
-	}
-
-	fillLastBytesWithNull(n, distance);
-}
-
-void copyLowBitsToHighBits(byte& a, byte& b, int amount)
-{
-	for (int i = 0; i < amount; i++)
-	{
-		// Lấy ra bit thứ i của a
-		byte ithBit = getBit(a, i);
-
-		// Gán bit đó cho bit thứ 8 - amount + i của b
-		setBit(b, 8 - amount + i, ithBit);
-	}
-}
-
-BigInt operator>>(BigInt n, int steps)
-{
-	BigInt res = n;
-	int byteDistance = steps / 8;
-	int bitDistance = steps % 8;
-
-	//int extraBytes = byteDistance + (bitDistance ? 1 : 0);
-	//// Thêm byte mở rộng
-	//addMoreBytes(res, extraBytes);
-	//// Dịch các byte về bên trái
-	//shiftByteLeft(res, extraBytes);
-
-	if (byteDistance)
-	{
-		shiftByteRight(res, byteDistance);
-	}
-
-	if (bitDistance) {
-		for (int i = 0; i < res.byteCount; i++)
-		{
-			res.bytes[i] >>= bitDistance;
-
-			if (i < res.byteCount - 1)
-			{
-				copyLowBitsToHighBits(res.bytes[i + 1], res.bytes[i], bitDistance);
-			}
-		}
-	}
-
-	//io.writeOutputs(n, steps, res, " >> ");
-	return res;
-}
-
-void operator >>= (BigInt& number, int steps) {
-	number = number >> steps;
-}
-
-void fillFirstBytesWithNull(BigInt& n, int amount)
-{
-	int end = n.byteCount < amount ? n.byteCount : amount;
-	for (int i = 0; i < end; i++)
-	{
-		n.bytes[i] = ZERO;
-	}
-}
-
 void shiftByteLeft(BigInt& n, int distance)
 {
 	for (int i = n.byteCount - 1; i >= distance - 1; i--)
@@ -404,10 +353,61 @@ BigInt operator<<(BigInt n, int steps)
 		}
 	}
 
-	removeLastBytesIfNull(res);
-
 	//io.writeOutputs(n, steps, res, " << ");
 	return res;
+}
+
+void shiftByteRight(BigInt& n, int distance)
+{
+	for (int i = 0; i < n.byteCount - distance; i++)
+	{
+		n.bytes[i] = n.bytes[i + distance];
+	}
+
+	fillLastBytesWithNull(n, distance);
+}
+
+void copyLowBitsToHighBits(byte& a, byte& b, int amount)
+{
+	for (int i = 0; i < amount; i++)
+	{
+		// Lấy ra bit thứ i của a
+		byte ithBit = getBit(a, i);
+
+		// Gán bit đó cho bit thứ 8 - amount + i của b
+		setBit(b, 8 - amount + i, ithBit);
+	}
+}
+
+BigInt operator>>(BigInt n, int steps)
+{
+	BigInt res = n;
+	int byteDistance = steps / 8;
+	int bitDistance = steps % 8;
+
+	if (byteDistance)
+	{
+		shiftByteRight(res, byteDistance);
+	}
+
+	if (bitDistance) {
+		for (int i = 0; i < res.byteCount; i++)
+		{
+			res.bytes[i] >>= bitDistance;
+
+			if (i < res.byteCount - 1)
+			{
+				copyLowBitsToHighBits(res.bytes[i + 1], res.bytes[i], bitDistance);
+			}
+		}
+	}
+
+	//io.writeOutputs(n, steps, res, " >> ");
+	return res;
+}
+
+void operator >>= (BigInt& number, int steps) {
+	number = number >> steps;
 }
 
 void operator<<=(BigInt& number, int steps)
@@ -509,7 +509,7 @@ BigInt operator*(BigInt a, BigInt b)
 		p >>= 1; // chia đôi q
 	}
 
-	io.writeOutputs(a, b, res, " * ");
+	//io.writeOutputs(a, b, res, " * ");
 	return res;
 }
 
@@ -550,28 +550,31 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 {
 	if (b == 0) return;
 
-	//? Nếu hai số khác dấu thì kết quả sẽ là âm
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+
+	//* Nếu hai số khác dấu thì kết quả sẽ là âm
 	bool isResultNegative = a.isNegative() != b.isNegative();
 	bool isDivided = false;
 
 	q = 0;
+	r = 0;
 	a = abs(a);
 	b = abs(b);
 
-	//? Lấy chênh lệch độ dài bit của hai số
+	//* Lấy chênh lệch độ dài bit của hai số
 	int32_t bBitLength = getBitLength(b);
 	int32_t deltaBitLength = getBitLength(a) - bBitLength;
 
-	//? Lặp đến khi độ dài bit của hai số giống nhau (chênh lệch = 0)
+	//* Lặp đến khi độ dài bit của hai số giống nhau (chênh lệch = 0)
 	while (deltaBitLength > 1)
 	{
 		deltaBitLength -= 1;
 		BigInt one = 1;
 
-		//? Cộng vào q ở vị trí delta giá trị 1 (delta giảm dần đến 0)
+		//* Cộng vào q ở vị trí delta giá trị 1 (delta giảm dần đến 0)
 		q = q + (one << deltaBitLength);
 
-		//? Dịch vị trí của b sang trái delta vị trí và trừ vào số bị chia (số a)
+		//* Dịch vị trí của b sang trái delta vị trí và trừ vào số bị chia (số a)
 		a = a - (b << deltaBitLength);
 
 		deltaBitLength = getBitLength(a) - bBitLength;
@@ -579,34 +582,47 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 		isDivided = true;
 	}
 
-	//? Chia lần cuối cùng (kết quả nằm ở vị trí 0)
+	//* Chia lần cuối cùng (kết quả nằm ở vị trí 0)
 	while (a >= b)
 	{
-		//? Cộng giá trị 1 vào thương rồi trừ số bị chia cho số chia
+		//* Cộng giá trị 1 vào thương rồi trừ số bị chia cho số chia
 		q = q + 1;
 		a = a - b;
 
 		isDivided = true;
 	}
 
-	//? Phần dư
+	//* Phần dư
 	r = a;
 
-	//? Lấy bù 2 nếu là số âm
+	//* Lấy bù 2 nếu là số âm
 	if (isResultNegative)
 	{
 		q = twoComplement(q);
 
-		//? Nếu có thực hiện phép chia thì chuyển số dư thành dạng bù 2
+		//* Nếu có thực hiện phép chia thì chuyển số dư thành dạng bù 2
 		if (isDivided)
 			r = twoComplement(a);
+	}
+
+	int32_t paddingByteCount = maxByteCount - q.byteCount;
+	int32_t excessByteCount = maxByteCount - r.byteCount;
+
+	//* Thêm byte đệm nếu thương số có ít hơn maxByteCount byte
+	if (paddingByteCount > 0)
+	{
+		addMoreBytes(q, paddingByteCount);
+	}
+	//* Xóa byte thừa nếu số dư có nhiều hơn maxByteCount byte
+	else if (excessByteCount < 0)
+	{
+		removeLastBytes(r, -excessByteCount);
 	}
 }
 
 BigInt operator/(BigInt a, BigInt b)
 {
-	BigInt r;
-	BigInt q = 0;
+	BigInt q, r;
 
 	division(a, b, q, r);
 
@@ -616,11 +632,25 @@ BigInt operator/(BigInt a, BigInt b)
 
 BigInt operator%(BigInt a, BigInt b)
 {
-	BigInt q;
-	BigInt r = 0;
+	BigInt q, r;
 
 	division(a, b, q, r);
 
 	io.writeOutputs(a, b, r, " % ");
 	return r;
+}
+
+// TODO: understand
+int32_t getValue(BigInt n)
+{
+	int32_t value = 0;
+	BigInt nAbs = abs(n);
+
+	uint32_t valueBytesCount = nAbs.byteCount > 4 ? 4 : nAbs.byteCount;
+
+	for (uint32_t i = 0; i < valueBytesCount; i++) {
+		value += nAbs.bytes[i] * ((int32_t)pow(256, i));
+	}
+
+	return value;
 }

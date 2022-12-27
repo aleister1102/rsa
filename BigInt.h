@@ -4,9 +4,8 @@
 #include <string>
 
 using namespace std;
-typedef unsigned char byte;
 
-static const byte ZERO = 0b00000000;
+typedef unsigned char byte;
 
 static byte ByteMask[8] = {
 	0b00000001,
@@ -19,30 +18,28 @@ static byte ByteMask[8] = {
 	0b10000000
 };
 
-class BigInt;
-
-// Lớp số nguyên lớn không dấu
 class BigInt
 {
 public:
 	byte* bytes;
 	uint32_t byteCount;
+	bool fixedByteCount;
 
 public:
-	BigInt() : bytes(nullptr), byteCount(0) {}
+	BigInt() : bytes(nullptr), byteCount(0), fixedByteCount(false) {}
 
-	BigInt(uint32_t initByteCount) {
+	BigInt(uint32_t initByteCount) : fixedByteCount(false) {
 		byteCount = initByteCount;
 		bytes = (byte*)malloc(byteCount * sizeof(byte));
-		memset(bytes, 0, byteCount);
+		memset(bytes, 0, byteCount * sizeof(byte));
 	}
 
-	BigInt(const BigInt& other) : bytes(nullptr), byteCount(0)
+	BigInt(const BigInt& other) : bytes(nullptr), byteCount(0), fixedByteCount(false)
 	{
 		*this = other;
 	}
 
-	BigInt(int value) : bytes(nullptr), byteCount(0)
+	BigInt(int value) : bytes(nullptr), byteCount(0), fixedByteCount(false)
 	{
 		*this = value;
 	}
@@ -87,8 +84,13 @@ public:
 	bool isZero();
 };
 
-void removeLastBytesIfNull(BigInt& n);
-void shiftByteLeft(BigInt& number, int distance);
+void removeLastBytesIfNull(BigInt& n, int preserve = 1);
+
+BigInt abs(BigInt n);
+
+void division(BigInt a, BigInt b, BigInt& q, BigInt& r);
+
+int32_t getValue(BigInt n);
 
 BigInt operator + (BigInt a, BigInt b);
 BigInt operator + (BigInt a, int value);

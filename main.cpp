@@ -7,42 +7,11 @@ using namespace std;
 
 vector<tuple<BigInt, BigInt>> testCases;
 
-// Đọc dữ liệu từ file
-void readInputs() {
-	fstream f("input.txt", ios::in);
-	string numberA, numberB;
-
-	if (f.is_open())
-	{
-		while (!f.eof())
-		{
-			f >> numberA;
-			f >> numberB;
-
-			if (numberA == "" || numberB == "")
-				continue;
-
-			BigInt a = io.inputBin(numberA);
-			BigInt b = io.inputBin(numberB);
-
-			testCases.push_back(make_tuple(a, b));
-		}
-	}
-	f.close();
-}
-
-void clearOutputs()
+void operatorTest(BigInt a, BigInt b)
 {
-	fstream f("output.txt", ios::out);
-	f.close();
-}
-
-// Triển khai các thao tác
-void test(BigInt a, BigInt b)
-{
+	a / b;
 	a% b;
 #if 0
-	a / b;
 	a* b;
 	a < b;
 	a > b;
@@ -57,18 +26,33 @@ void test(BigInt a, BigInt b)
 #endif
 }
 
-int main()
+void ioTest(BigInt a)
 {
-	readInputs();
-	clearOutputs();
+	string binStr = converter.bigIntToBinaryStr(a);
+	io.writeOuput(binStr);
+
+	string decStr = converter.bigIntToDecimalStr(a);
+	io.writeOuput(decStr);
+}
+
+void test()
+{
+	io.readInputs(testCases);
+	io.clearOutputs();
 
 	for (auto testCase : testCases)
 	{
 		BigInt a, b;
 		tie(a, b) = testCase;
 
-		test(a, b);
+		//operatorTest(a, b);
+		ioTest(a);
+		ioTest(b);
 	}
+}
 
+int main()
+{
+	test();
 	return 0;
 }

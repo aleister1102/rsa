@@ -1,55 +1,56 @@
 #include "BigIntConverter.h"
+#include "BigIntIO.h"
 
-string BigIntConverter::reverseString(string str)
+string reverseString(string str)
 {
 	reverse(str.begin(), str.end());
 	return str;
 }
 
-string BigIntConverter::removeSpaces(string str)
+string removeSpaces(string str)
 {
-	string result;
+	string res;
 
 	for (auto c : str)
 	{
 		if (c != ' ')
-			result += c;
+			res += c;
 	}
 
-	return result;
+	return res;
 }
 
 byte BigIntConverter::stringToByte(string str)
 {
-	byte result = 0;
+	byte res = 0;
 
 	for (char bit : str)
 	{
 		// Dịch trái sang một vị trí để có vị trí trống ở cuối
-		result = result << 1;
+		res = res << 1;
 
 		// Thêm bit vào cuối
-		result += bit - '0';
+		res += bit - '0';
 	}
 
-	return result;
+	return res;
 }
 
-string BigIntConverter::byteToString(byte number, bool isReversed)
+string BigIntConverter::byteToString(byte n, bool isReversed)
 {
-	string result;
+	string res;
 
 	for (int i = 0; i < 8; i++)
 	{
 		// Lấy bit thứ i
-		result += to_string(number & 1);
+		res += to_string(n & 1);
 
 		// Dịch dãy các bits sang một bit để lấy bit tiếp theo
-		number >>= 1;
+		n >>= 1;
 	}
 
-	if (isReversed) result = reverseString(result);
-	return result;
+	if (isReversed) res = reverseString(res);
+	return res;
 }
 
 BigInt BigIntConverter::binaryStrToBigInt(string str)
@@ -58,9 +59,9 @@ BigInt BigIntConverter::binaryStrToBigInt(string str)
 	int offset = length;
 	int byteCount = length / 8 + (length % 8 != 0);
 
-	BigInt result;
-	result.byteCount = byteCount;
-	result.bytes = (byte*)malloc(result.byteCount * sizeof(byte));
+	BigInt res;
+	res.byteCount = byteCount;
+	res.bytes = (byte*)malloc(res.byteCount * sizeof(byte));
 
 	// Tách các octets
 	for (int i = 0; i < byteCount; i++)
@@ -75,7 +76,7 @@ BigInt BigIntConverter::binaryStrToBigInt(string str)
 			else
 				byteStr = str.substr(0, length);
 
-			result.bytes[i] = BigIntConverter::stringToByte(byteStr);
+			res.bytes[i] = BigIntConverter::stringToByte(byteStr);
 		}
 		catch (exception e)
 		{
@@ -86,18 +87,66 @@ BigInt BigIntConverter::binaryStrToBigInt(string str)
 		length -= 8;
 	}
 
-	return result;
+	return res;
 }
 
-string BigIntConverter::bigIntToBinaryStr(BigInt number)
+string BigIntConverter::bigIntToBinaryStr(BigInt n)
 {
-	string result;
+	//removeLastBytesIfNull(n, 2);
 
-	for (int i = number.byteCount - 1; i >= 0; i--)
+	string res;
+
+	for (int i = n.byteCount - 1; i >= 0; i--)
 	{
-		string str = BigIntConverter::byteToString(number.bytes[i], true);
-		result += str + " ";
+		string str = BigIntConverter::byteToString(n.bytes[i], true);
+		res += str + " ";
 	}
 
-	return result;
+	return res;
+}
+
+void insertCharFrontStr(char** str, int* strLen, char chr) {
+	(*strLen)++;
+	(*str) = (char*)realloc((*str), (*strLen) + 1);
+	memcpy_s((*str) + 1, (*strLen), (*str), (*strLen));
+	(*str)[0] = chr;
+}
+
+char intToDigit(int32_t value)
+{
+	char digit;
+
+	digit = '0' + value;
+
+	return digit;
+}
+
+string BigIntConverter::bigIntToDecimalStr(BigInt n)
+{
+	bool sign = n.isNegative();
+
+	//? Tại sao lại cần lấy giá trị tuyệt đối của n
+	BigInt i = abs(n), base = 10, r;
+
+	string res;
+
+	do {
+		//* Lấy i chia cho cơ số là 10
+		division(i, base, i, r);
+
+		//* Lấy số dư, số dư lớn nhất là 9
+		int32_t value = getValue(r);
+
+		//* Chuyển thành dạng chữ số
+		char digit = intToDigit(value);
+
+		//* Cộng vào phía trước chuỗi
+		res = digit + res;
+	} while (i > 0);
+
+	if (sign == 1) {
+		res = "-" + res;
+	}
+
+	return res;
 }

@@ -1,46 +1,53 @@
 #include "BigIntIO.h"
-#include "BigInt.h"
 #include <fstream>
 
-BigInt BigIntIO::inputBin(string binaryString)
+void BigIntIO::clearOutputs()
 {
-	BigInt result;
-
-	result = converter.binaryStrToBigInt(binaryString);
-
-	return result;
-}
-string BigIntIO::outputBin(BigInt number)
-{
-	string result;
-
-	result = converter.bigIntToBinaryStr(number);
-
-	return result;
-}
-
-void BigIntIO::displayInputs(BigInt a, BigInt b, string op)
-{
-	cout << "Input for " << op << "\n";
-	cout << converter.bigIntToBinaryStr(a) << endl;
-	cout << converter.bigIntToBinaryStr(b) << endl;
-	cout << "\n";
-}
-
-void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt result, string op)
-{
-	removeLastBytesIfNull(result);
-
-	fstream f("output.txt", ios::app);
-	f << io.outputBin(a) << op << io.outputBin(b) << " = " << io.outputBin(result) << endl;
+	fstream f("output.txt", ios::out);
 	f.close();
 }
 
-void BigIntIO::writeOutputs(BigInt a, int b, BigInt result, string op)
+void BigIntIO::readInputs(vector<tuple<BigInt, BigInt>>& testCases)
 {
-	removeLastBytesIfNull(result);
+	fstream f("input.txt", ios::in);
+	string numberA, numberB;
 
+	if (f.is_open())
+	{
+		while (!f.eof())
+		{
+			f >> numberA;
+			f >> numberB;
+
+			if (numberA == "" || numberB == "")
+				continue;
+
+			BigInt a = converter.binaryStrToBigInt(numberA);
+			BigInt b = converter.binaryStrToBigInt(numberB);
+
+			testCases.push_back(make_tuple(a, b));
+		}
+	}
+	f.close();
+}
+
+void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt res, string op)
+{
 	fstream f("output.txt", ios::app);
-	f << io.outputBin(a) << op << b << " = " << io.outputBin(result) << endl;
+	f << converter.bigIntToBinaryStr(a) << op << converter.bigIntToBinaryStr(b) << " = " << converter.bigIntToBinaryStr(res) << endl;
+	f.close();
+}
+
+void BigIntIO::writeOutputs(BigInt a, int b, BigInt res, string op)
+{
+	fstream f("output.txt", ios::app);
+	f << converter.bigIntToBinaryStr(a) << op << b << " = " << converter.bigIntToBinaryStr(res) << endl;
+	f.close();
+}
+
+void BigIntIO::writeOuput(string output)
+{
+	fstream f("output.txt", ios::app);
+	f << output << endl;
 	f.close();
 }
