@@ -6,7 +6,7 @@
 using namespace std;
 typedef unsigned char byte;
 
-static byte ZERO = 0b00000000;
+static const byte ZERO = 0b00000000;
 
 static byte ByteMask[8] = {
 	0b00000001,
@@ -127,5 +127,7 @@ bool operator > (BigInt a, BigInt b);
 bool operator >= (BigInt a, BigInt b);
 
 BigInt operator *(BigInt a, BigInt b);
+
+BigInt operator~(BigInt a);
 
 BigInt operator/(BigInt a, BigInt b);

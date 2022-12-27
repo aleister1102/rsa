@@ -46,7 +46,7 @@ bool BigInt::isNegative()
 bool BigInt::isOdd()
 {
 	byte firstBit = getFirstBit(*this);
-	return firstBit == 1;
+	return firstBit != 0;
 }
 
 bool BigInt::isEven()
@@ -55,19 +55,19 @@ bool BigInt::isEven()
 	return firstBit == 0;
 }
 
-byte getBit(byte number, int index)
+byte getBit(byte n, int index)
 {
-	return (number >> index) & 1;
+	return (n >> index) & ByteMask[0];
 }
 
-void setBit(byte& number, int index, byte bit)
+void setBit(byte& n, int index, byte bit)
 {
 	if (bit)
 	{
-		number = (1 << index) | number;
+		n = (1 << index) | n;
 	}
 	else {
-		number = (~(1 << index)) & number;
+		n = (~(1 << index)) & n;
 	}
 }
 
@@ -443,7 +443,7 @@ bool operator<=(BigInt a, BigInt b)
 
 	bool res = difference.isNegative() || a == b;
 
-	io.writeOutputs(a, b, res, " <= ");
+	//io.writeOutputs(a, b, res, " <= ");
 	return res;
 }
 
@@ -454,7 +454,7 @@ bool operator>(BigInt a, BigInt b) {
 
 	bool res = different.isPositive() && a != b;
 
-	io.writeOutputs(a, b, res, " > ");
+	//io.writeOutputs(a, b, res, " > ");
 	return res;
 }
 
@@ -465,7 +465,7 @@ bool operator>=(BigInt a, BigInt b) {
 
 	bool res = different.isPositive() || a == b;
 
-	io.writeOutputs(a, b, res, " >= ");
+	//io.writeOutputs(a, b, res, " >= ");
 	return res;
 }
 
@@ -475,11 +475,11 @@ BigInt operator*(BigInt a, BigInt b)
 	BigInt q = a;
 	BigInt p = b;
 
-	// b sẽ là số nhỏ hơn
+	// Sắp xếp thứ tự sao cho b sẽ là số nhỏ hơn
 	if (a < b)
 		swap(a, b);
 
-	int k = 0;
+	// Thuật toán russian peasant
 	while (p != 0)
 	{
 		if (p.isOdd())
@@ -487,87 +487,107 @@ BigInt operator*(BigInt a, BigInt b)
 
 		q <<= 1; // nhân đôi q
 		p >>= 1; // chia đôi q
-
-		// Nếu đã dời hết một octet (7 lần)
-		// thì cấp phát thêm cho a một byte nữa
-		if (++k == 7)
-		{
-			addMoreBytes(q, 1);
-			k = 0;
-		}
 	}
 
 	io.writeOutputs(a, b, res, " * ");
 	return res;
 }
 
-uint32_t getBitCount(BigInt& n) {
-	uint32_t bitCount = (n.byteCount * 8);
+BigInt operator~(BigInt n) {
+	BigInt res = n;
+	if (res == 0) return res;
 
-	for (int i = 7; i >= 0; i--) {
-		if (getBit(n.bytes[n.byteCount - 1], i) == 1) break;
-		bitCount--;
+	for (int i = 0; i < res.byteCount; i++)
+	{
+		// Lật bit
+		res.bytes[i] = ~res.bytes[i];
 	}
-	return bitCount;
+
+	res = res + 1;
+
+	return res;
 }
 
-bool isLesserThanZero(BigInt& n)
+uint32_t getBitLength(BigInt n) {
+	removeLastBytesIfNull(n);
+	uint32_t count = (n.byteCount * 8);
+
+	// Trừ bớt các bit 0 ở byte cuối
+	byte lastByte = n.bytes[n.byteCount - 1];
+	for (int i = 7; i >= 0; i--) {
+		if (getBit(lastByte, i) != 0) break;
+		count--;
+	}
+
+	return count;
+}
+
+BigInt abs(BigInt n)
 {
-	byte lastBit = getLastBit(n);
-	bool result = lastBit == 0 ? false : true;
-	return result;
+	BigInt res = n;
+	if (res.isNegative()) res = ~res;
+	return res;
+}
+
+void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
+{
+	if (b == 0) return;
+
+	//? Nếu hai số khác dấu thì kết quả sẽ là âm
+	bool isResNegative = a.isNegative() != b.isNegative();
+
+	q = 0;
+	a = abs(a);
+	b = abs(b);
+
+	// Ví dụ
+	// 10011111
+	// 00001100
+
+	int32_t bBitLength = getBitLength(b);
+	int32_t deltaBitLength = getBitLength(a) - bBitLength; // Chênh lệch độ dài bit của hai số là 4
+
+	//? Lặp đến khi độ dài bit của hai số giống nhau
+	while (deltaBitLength > 1)
+	{
+		deltaBitLength -= 1; // Chênh lệch còn 1
+		BigInt p = 1; // 0000 0001
+		//p << deltaBitLength; // p = 0000 0010
+
+		//? Cộng vào q ở vị trí delta giá trị 1 (delta giảm dần đến 0)
+		q = q + (p << deltaBitLength); // q = 0000 1100
+
+		//? Dịch vị trí của b sang trái delta vị trí
+		//? và trừ vào số bị chia (a)
+		a = a - (b << deltaBitLength); // b = 0001 1000
+		// a = 0010 0111 - 0001 1000 = 0000 1111
+
+		deltaBitLength = getBitLength(a) - bBitLength; // chênh lệch độ dài là 4 - 4 = 0 => kết thúc
+	}
+
+	//? Chia lần cuối cùng (kết quả nằm ở vị trí 0)
+	while (a >= b)
+	{
+		BigInt one = 1;
+
+		//? Cộng giá trị 1 vào thương rồi trừ số bị chia cho số chia
+		q = q + one; // q = 0000 0100
+		a = a - b; // a  = 0000 0100
+	}
+
+	if (isResNegative) q = ~q;
+
+	r = a;
 }
 
 BigInt operator/(BigInt a, BigInt b)
 {
-	io.displayInputs(a, b, "/");
+	BigInt q = 0;
+	BigInt r;
 
-	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	division(a, b, q, r);
 
-	BigInt r(maxByteCount);
-	int k = b.byteCount * 8;
+	io.writeOutputs(a, b, q, " / ");
 
-	while (k > 0)
-	{
-		// Dịch trái chuỗi [r, a]
-
-		// Lấy bit cuối của a
-		byte lastBitA = getLastBit(a);
-
-		//cout << "Before shift: " <<
-		//	io.outputBin(r) << " " <<
-		//	io.outputBin(a) << endl;
-
-		a << 1;
-		r << 1;
-
-		// Gán cho bit đầu của r
-		setBit(r.bytes[0], 0, lastBitA);
-
-		cout << "After shift: " <<
-			io.outputBin(r) << " " <<
-			io.outputBin(a) << endl;
-
-		r -= b;
-		cout << "After subtract: " << io.outputBin(r) << endl;
-
-		// Nếu r < 0
-		if (isLesserThanZero(r))
-		{
-			// Khôi phục r và gán bit đầu của a là 0
-			r += b;
-			setBit(a.bytes[0], 0, 0);
-
-			cout << "Restore: " << io.outputBin(r) << endl;
-		}
-		else
-		{
-			// Gán bit đầu của a là 1
-			setBit(a.bytes[0], 0, 1);
-		}
-
-		k -= 1;
-	}
-
-	return a;
+	return q;
 }

@@ -19,6 +19,9 @@ void readInputs() {
 			f >> numberA;
 			f >> numberB;
 
+			if (numberA == "" || numberB == "")
+				continue;
+
 			BigInt a = io.inputBin(numberA);
 			BigInt b = io.inputBin(numberB);
 
@@ -37,8 +40,9 @@ void clearOutputs()
 // Triển khai các thao tác
 void test(BigInt a, BigInt b)
 {
-	a* b;
+	a / b;
 #if 0
+	a* b;
 	a < b;
 	a > b;
 	a& b;
