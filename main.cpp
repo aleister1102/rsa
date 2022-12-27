@@ -37,20 +37,18 @@ void clearOutputs()
 // Triển khai các thao tác
 void test(BigInt a, BigInt b)
 {
-	a >= b;
-	a <= b;
-#if 0
-	a > b;
-	a < b;
 	a* b;
-	a + b;
+#if 0
+	a < b;
+	a > b;
 	a& b;
 	a | b;
+	a + b;
 	a - b;
 	a == b;
 	a != b;
-	a >> 10;
 	a << 5;
+	a >> 10;
 #endif
 }
 

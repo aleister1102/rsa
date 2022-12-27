@@ -1,4 +1,5 @@
 #include "BigIntIO.h"
+#include "BigInt.h"
 #include <fstream>
 
 BigInt BigIntIO::inputBin(string binaryString)
@@ -28,6 +29,8 @@ void BigIntIO::displayInputs(BigInt a, BigInt b, string op)
 
 void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt result, string op)
 {
+	removeLastBytesIfNull(result);
+
 	fstream f("output.txt", ios::app);
 	f << io.outputBin(a) << op << io.outputBin(b) << " = " << io.outputBin(result) << endl;
 	f.close();
@@ -35,6 +38,8 @@ void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt result, string op)
 
 void BigIntIO::writeOutputs(BigInt a, int b, BigInt result, string op)
 {
+	removeLastBytesIfNull(result);
+
 	fstream f("output.txt", ios::app);
 	f << io.outputBin(a) << op << b << " = " << io.outputBin(result) << endl;
 	f.close();

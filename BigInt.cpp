@@ -39,7 +39,7 @@ bool BigInt::isPositive()
 bool BigInt::isNegative()
 {
 	byte lastBit = getLastBit(*this);
-	bool res = *this != 0 && lastBit == 1; // khác 0 và có bit cuối là 1
+	bool res = *this != 0 && lastBit != 0; // khác 0 và có bit cuối khác 0
 	return res;
 }
 
@@ -71,7 +71,13 @@ void setBit(byte& number, int index, byte bit)
 	}
 }
 
-void addPaddingBytes(BigInt& n, int amount)
+void swap(BigInt& a, BigInt& b) {
+	BigInt temp = a;
+	a = b;
+	b = temp;
+}
+
+void addMoreBytes(BigInt& n, int amount)
 {
 	n.byteCount += amount;
 	auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
@@ -85,15 +91,17 @@ void addPaddingBytes(BigInt& n, int amount)
 	}
 }
 
-void removeLastByteIfNull(BigInt& n)
+void removeLastBytesIfNull(BigInt& n)
 {
 	byte lastByte = getLastByte(n);
 
-	if (lastByte == 0)
+	while (lastByte == 0 && n.byteCount > 1)
 	{
 		n.byteCount -= 1;
 		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
 		n.bytes = newMem ? newMem : nullptr;
+
+		lastByte = getLastByte(n);
 	}
 }
 
@@ -104,7 +112,7 @@ void shareByteCount(BigInt& a, BigInt& b)
 	{
 		// Lấy số có kích thước byte ít hơn và cấp phát thêm vùng nhớ
 		BigInt* lesserByteNumber = (a.byteCount > b.byteCount) ? &b : &a;
-		addPaddingBytes(*lesserByteNumber, abs((int)a.byteCount - (int)b.byteCount));
+		addMoreBytes(*lesserByteNumber, abs((int)a.byteCount - (int)b.byteCount));
 	}
 }
 
@@ -136,7 +144,7 @@ BigInt operator+(BigInt a, BigInt b)
 	}
 
 	// Kiểm tra nếu byte dư ra là rỗng thì xóa
-	removeLastByteIfNull(res);
+	removeLastBytesIfNull(res);
 
 	//io.writeOutputs(a, b, res, " + ");
 
@@ -252,21 +260,21 @@ bool operator!=(BigInt a, int value)
 	return a != b;
 }
 
-void fillLastBytesWithNull(BigInt* n, int amount)
+void fillLastBytesWithNull(BigInt& n, int amount)
 {
-	int end = n->byteCount < amount ? 0 : n->byteCount - amount;
+	int end = n.byteCount < amount ? 0 : n.byteCount - amount;
 
-	for (int i = n->byteCount - 1; i >= end; i--)
+	for (int i = n.byteCount - 1; i >= end; i--)
 	{
-		n->bytes[i] = ZERO;
+		n.bytes[i] = ZERO;
 	}
 }
 
-void shiftByteRight(BigInt* n, int distance)
+void shiftByteRight(BigInt& n, int distance)
 {
-	for (int i = 0; i < n->byteCount - distance; i++)
+	for (int i = 0; i < n.byteCount - distance; i++)
 	{
-		n->bytes[i] = n->bytes[i + distance];
+		n.bytes[i] = n.bytes[i + distance];
 	}
 
 	fillLastBytesWithNull(n, distance);
@@ -286,13 +294,19 @@ void copyLowBitsToHighBits(byte& a, byte& b, int amount)
 
 BigInt operator>>(BigInt n, int steps)
 {
+	BigInt res = n;
 	int byteDistance = steps / 8;
 	int bitDistance = steps % 8;
-	BigInt res = n;
+
+	//int extraBytes = byteDistance + (bitDistance ? 1 : 0);
+	//// Thêm byte mở rộng
+	//addMoreBytes(res, extraBytes);
+	//// Dịch các byte về bên trái
+	//shiftByteLeft(res, extraBytes);
 
 	if (byteDistance)
 	{
-		shiftByteRight(&res, byteDistance);
+		shiftByteRight(res, byteDistance);
 	}
 
 	if (bitDistance) {
@@ -315,23 +329,23 @@ void operator >>= (BigInt& number, int steps) {
 	number = number >> steps;
 }
 
-void fillFirstBytesWithNull(BigInt* number, int amount)
+void fillFirstBytesWithNull(BigInt& n, int amount)
 {
-	int end = number->byteCount < amount ? number->byteCount : amount;
+	int end = n.byteCount < amount ? n.byteCount : amount;
 	for (int i = 0; i < end; i++)
 	{
-		number->bytes[i] = ZERO;
+		n.bytes[i] = ZERO;
 	}
 }
 
-void shiftByteLeft(BigInt* number, int distance)
+void shiftByteLeft(BigInt& n, int distance)
 {
-	for (int i = number->byteCount - 1; i >= distance - 1; i--)
+	for (int i = n.byteCount - 1; i >= distance - 1; i--)
 	{
-		number->bytes[i] = number->bytes[i - distance];
+		n.bytes[i] = n.bytes[i - distance];
 	}
 
-	fillFirstBytesWithNull(number, distance);
+	fillFirstBytesWithNull(n, distance);
 }
 
 void copyHighBitsToLowBits(byte a, byte& b, int amount)
@@ -352,9 +366,12 @@ BigInt operator<<(BigInt n, int steps)
 	int bitDistance = steps % 8;
 	BigInt res = n;
 
+	// Thêm byte mở rộng
+	addMoreBytes(res, byteDistance + (bitDistance ? 1 : 0));
+
 	if (byteDistance)
 	{
-		shiftByteLeft(&res, byteDistance);
+		shiftByteLeft(res, byteDistance);
 	}
 
 	if (bitDistance) {
@@ -437,7 +454,7 @@ bool operator>(BigInt a, BigInt b) {
 
 	bool res = different.isPositive() && a != b;
 
-	//io.writeOutputs(a, b, res, " > ");
+	io.writeOutputs(a, b, res, " > ");
 	return res;
 }
 
@@ -458,9 +475,12 @@ BigInt operator*(BigInt a, BigInt b)
 	BigInt q = a;
 	BigInt p = b;
 
-	int k = 0;
+	// b sẽ là số nhỏ hơn
+	if (a < b)
+		swap(a, b);
 
-	while (p.isPositive())
+	int k = 0;
+	while (p != 0)
 	{
 		if (p.isOdd())
 			res += q;
@@ -470,11 +490,11 @@ BigInt operator*(BigInt a, BigInt b)
 
 		// Nếu đã dời hết một octet (7 lần)
 		// thì cấp phát thêm cho a một byte nữa
-		/*if (++k == 7)
+		if (++k == 7)
 		{
-			addPaddingBytes(a, 1);
+			addMoreBytes(q, 1);
 			k = 0;
-		}*/
+		}
 	}
 
 	io.writeOutputs(a, b, res, " * ");
