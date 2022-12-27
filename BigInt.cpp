@@ -2,7 +2,7 @@
 #include "BigIntConverter.h"
 #include "BigIntIO.h"
 
-uint16_t getMaxByteCount(int a, int b)
+uint32_t getMaxByteCount(int a, int b)
 {
 	return a > b ? a : b;
 }
@@ -27,6 +27,32 @@ byte getFirstBit(const BigInt& n)
 {
 	byte firstByte = getFirstByte(n);
 	return firstByte & ByteMask[0];
+}
+
+bool BigInt::isPositive()
+{
+	byte lastBit = getLastBit(*this);
+	bool res = *this != 0 && lastBit == 0; // khác 0 và có bit cuối là 0
+	return  res;
+}
+
+bool BigInt::isNegative()
+{
+	byte lastBit = getLastBit(*this);
+	bool res = *this != 0 && lastBit == 1; // khác 0 và có bit cuối là 1
+	return res;
+}
+
+bool BigInt::isOdd()
+{
+	byte firstBit = getFirstBit(*this);
+	return firstBit == 1;
+}
+
+bool BigInt::isEven()
+{
+	byte firstBit = getFirstBit(*this);
+	return firstBit == 0;
 }
 
 byte getBit(byte number, int index)
@@ -84,7 +110,7 @@ void shareByteCount(BigInt& a, BigInt& b)
 
 BigInt operator+(BigInt a, BigInt b)
 {
-	uint16_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 	BigInt res(maxByteCount + 1); // cấp phát dư 1 byte
 
 	shareByteCount(a, b);
@@ -145,7 +171,7 @@ void twoComplement(BigInt& n)
 
 BigInt operator-(BigInt a, BigInt b)
 {
-	uint16_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 	BigInt res(maxByteCount);
 
 	shareByteCount(a, b);
@@ -343,7 +369,7 @@ BigInt operator<<(BigInt n, int steps)
 		}
 	}
 
-	io.writeOutputs(n, steps, res, " << ");
+	//io.writeOutputs(n, steps, res, " << ");
 	return res;
 }
 
@@ -353,7 +379,7 @@ void operator<<=(BigInt& number, int steps)
 }
 
 BigInt operator &(BigInt a, BigInt b) {
-	uint16_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 	BigInt res(maxByteCount);
 
 	shareByteCount(a, b);
@@ -363,13 +389,13 @@ BigInt operator &(BigInt a, BigInt b) {
 		res.bytes[i] = a.bytes[i] & b.bytes[i];
 	}
 
-	io.writeOutputs(a, b, res, " & ");
+	//io.writeOutputs(a, b, res, " & ");
 	return res;
 }
 
 BigInt operator |(BigInt a, BigInt b)
 {
-	uint16_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 	BigInt res(maxByteCount);
 
 	shareByteCount(a, b);
@@ -379,41 +405,84 @@ BigInt operator |(BigInt a, BigInt b)
 		res.bytes[i] = a.bytes[i] | b.bytes[i];
 	}
 
-	io.writeOutputs(a, b, res, " | ");
+	//io.writeOutputs(a, b, res, " | ");
+	return res;
+}
+
+bool operator<(BigInt a, BigInt b) {
+	shareByteCount(a, b);
+
+	BigInt different = a - b;
+
+	bool res = different.isNegative() && a != b;
+
+	//io.writeOutputs(a, b, res, " < ");
+	return res;
+}
+
+bool operator<=(BigInt a, BigInt b)
+{
+	BigInt difference = a - b;
+
+	bool res = difference.isNegative() || a == b;
+
+	io.writeOutputs(a, b, res, " <= ");
+	return res;
+}
+
+bool operator>(BigInt a, BigInt b) {
+	shareByteCount(a, b);
+
+	BigInt different = a - b;
+
+	bool res = different.isPositive() && a != b;
+
+	//io.writeOutputs(a, b, res, " > ");
+	return res;
+}
+
+bool operator>=(BigInt a, BigInt b) {
+	shareByteCount(a, b);
+
+	BigInt different = a - b;
+
+	bool res = different.isPositive() || a == b;
+
+	io.writeOutputs(a, b, res, " >= ");
 	return res;
 }
 
 BigInt operator*(BigInt a, BigInt b)
 {
 	BigInt res = 0;
+	BigInt q = a;
+	BigInt p = b;
+
 	int k = 0;
 
-	while (b != 0)
+	while (p.isPositive())
 	{
-		byte firstBit = getFirstBit(b);
+		if (p.isOdd())
+			res += q;
 
-		if (firstBit)
-			res += a;
-		else
-			res += 0;
-
-		b >>= 1;
-		a <<= 1;
+		q <<= 1; // nhân đôi q
+		p >>= 1; // chia đôi q
 
 		// Nếu đã dời hết một octet (7 lần)
 		// thì cấp phát thêm cho a một byte nữa
-		if (++k == 7)
+		/*if (++k == 7)
 		{
 			addPaddingBytes(a, 1);
 			k = 0;
-		}
+		}*/
 	}
 
+	io.writeOutputs(a, b, res, " * ");
 	return res;
 }
 
-uint16_t getBitCount(BigInt& n) {
-	uint16_t bitCount = (n.byteCount * 8);
+uint32_t getBitCount(BigInt& n) {
+	uint32_t bitCount = (n.byteCount * 8);
 
 	for (int i = 7; i >= 0; i--) {
 		if (getBit(n.bytes[n.byteCount - 1], i) == 1) break;
@@ -433,7 +502,7 @@ BigInt operator/(BigInt a, BigInt b)
 {
 	io.displayInputs(a, b, "/");
 
-	uint16_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
+	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
 
 	BigInt r(maxByteCount);
 	int k = b.byteCount * 8;

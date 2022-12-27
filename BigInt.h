@@ -41,31 +41,32 @@ static byte LowBitByteMask[8] = {
 	0b11111111
 };
 
+class BigInt;
+
 // Lớp số nguyên lớn không dấu
 class BigInt
 {
 public:
 	byte* bytes;
-	uint16_t byteCount;
+	uint32_t byteCount;
 
 public:
-	BigInt()
-		: bytes(nullptr), byteCount(0) {}
+	BigInt() : bytes(nullptr), byteCount(0) {}
 
-	BigInt(uint16_t initByteCount) {
+	BigInt(uint32_t initByteCount) {
 		byteCount = initByteCount;
-		auto mem = (byte*)malloc(byteCount * sizeof(byte));
-		bytes = mem ? mem : nullptr;
+		bytes = (byte*)malloc(byteCount * sizeof(byte));
 		memset(bytes, 0, byteCount);
 	}
 
-	BigInt(byte* bytes, int byteCount)
-		: bytes(bytes), byteCount(byteCount) {}
-
-	BigInt(const BigInt& other)
-		: bytes(nullptr), byteCount(0)
+	BigInt(const BigInt& other) : bytes(nullptr), byteCount(0)
 	{
 		*this = other;
+	}
+
+	BigInt(int value) : bytes(nullptr), byteCount(0)
+	{
+		*this = value;
 	}
 
 	~BigInt() { free(bytes); }
@@ -81,17 +82,12 @@ public:
 			if (byteCount > 0)
 			{
 				bytes = (byte*)malloc(byteCount * sizeof(byte));
-				if (bytes == nullptr) return *this;
-
-				// Sao chép từng byte
-				for (int i = 0; i < byteCount; i++)
-				{
-					bytes[i] = other.bytes[i];
-				}
+				memcpy(bytes, other.bytes, byteCount);
 			}
 			else
 				bytes = nullptr;
 		}
+
 		return *this;
 	}
 
@@ -99,12 +95,17 @@ public:
 	{
 		free(bytes);
 		byteCount = 1;
-		bytes = (byte*)malloc(byteCount);
+		bytes = (byte*)malloc(byteCount * sizeof(byte));
 		if (bytes)
 			bytes[0] = value;
+		return *this;
 	}
 
 public:
+	bool isPositive();
+	bool isNegative();
+	bool isOdd();
+	bool isEven();
 };
 
 BigInt operator + (BigInt a, BigInt b);
@@ -134,6 +135,15 @@ bool operator>(BigInt a, BigInt b);
 BigInt operator &(BigInt a, BigInt b);
 
 BigInt operator |(BigInt a, BigInt b);
+
+// Chỉ xét trong phạm vi số byte lớn nhất của 2 số
+// Ví dụ với số 1 byte thì 0111 1111 sẽ là số dương
+// còn 1000 0000 sẽ là số âm
+bool operator < (BigInt a, BigInt b);
+bool operator <= (BigInt a, BigInt b);
+
+bool operator > (BigInt a, BigInt b);
+bool operator >= (BigInt a, BigInt b);
 
 BigInt operator *(BigInt a, BigInt b);
 
