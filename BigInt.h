@@ -106,8 +106,6 @@ public:
 
 public:
 };
-void shareByteCount(BigInt& a, BigInt& b);
-void addPaddingBytes(BigInt* number, int amount);
 
 BigInt operator + (BigInt a, BigInt b);
 BigInt operator + (BigInt a, int value);
