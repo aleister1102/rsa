@@ -32,14 +32,14 @@ byte getFirstBit(const BigInt& n)
 bool BigInt::isPositive()
 {
 	byte lastBit = getLastBit(*this);
-	bool res = *this != 0 && lastBit == 0; // khác 0 và có bit cuối là 0
+	bool res = !this->isZero() && lastBit == 0; // khác 0 và có bit cuối là 0
 	return  res;
 }
 
 bool BigInt::isNegative()
 {
 	byte lastBit = getLastBit(*this);
-	bool res = *this != 0 && lastBit != 0; // khác 0 và có bit cuối khác 0
+	bool res = !this->isZero() && lastBit != 0; // khác 0 và có bit cuối khác 0
 	return res;
 }
 
@@ -53,6 +53,14 @@ bool BigInt::isEven()
 {
 	byte firstBit = getFirstBit(*this);
 	return firstBit == 0;
+}
+
+bool BigInt::isZero()
+{
+	bool res = false;
+	if (this->byteCount == 1 && bytes[0] == 0)
+		res = true;
+	return res;
 }
 
 byte getBit(byte n, int index)
@@ -102,6 +110,16 @@ void removeLastBytesIfNull(BigInt& n)
 		n.bytes = newMem ? newMem : nullptr;
 
 		lastByte = getLastByte(n);
+	}
+}
+
+void removeLastBytes(BigInt& n, uint32_t amount)
+{
+	while (amount != 0 && n.byteCount - amount > 0)
+	{
+		n.byteCount -= 1;
+		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
+		n.bytes = newMem ? newMem : nullptr;
 	}
 }
 
@@ -166,15 +184,12 @@ void operator+=(BigInt& a, BigInt b)
 	a = a + b;
 }
 
-void twoComplement(BigInt& n)
+BigInt twoComplement(BigInt n)
 {
-	for (int i = 0; i < n.byteCount; i++)
-	{
-		// Lật bit
-		n.bytes[i] = ~n.bytes[i];
-	}
-
-	n = n + 1;
+	if (n.isZero()) return n;
+	BigInt res = ~(n);
+	res += 1;
+	return res;
 }
 
 BigInt operator-(BigInt a, BigInt b)
@@ -198,6 +213,9 @@ BigInt operator-(BigInt a, BigInt b)
 		// thì mượn của byte tiếp theo
 		borrow = (a.bytes[i] - b.bytes[i] - (borrow ? 1 : 0)) < 0;
 	}
+
+	// Cách 2: trừ cho bù 2 của b
+	//BigInt res = a + twoComplement(b);
 
 	//io.writeOutputs(a, b, res, " - ");
 
@@ -241,8 +259,8 @@ bool operator==(BigInt a, BigInt b)
 bool operator==(BigInt a, int value)
 {
 	BigInt b = value;
-
-	return a == b;
+	bool res = a == b;
+	return res;
 }
 
 bool operator!=(BigInt a, BigInt b)
@@ -386,6 +404,8 @@ BigInt operator<<(BigInt n, int steps)
 		}
 	}
 
+	removeLastBytesIfNull(res);
+
 	//io.writeOutputs(n, steps, res, " << ");
 	return res;
 }
@@ -495,15 +515,12 @@ BigInt operator*(BigInt a, BigInt b)
 
 BigInt operator~(BigInt n) {
 	BigInt res = n;
-	if (res == 0) return res;
 
 	for (int i = 0; i < res.byteCount; i++)
 	{
 		// Lật bit
 		res.bytes[i] = ~res.bytes[i];
 	}
-
-	res = res + 1;
 
 	return res;
 }
@@ -525,7 +542,7 @@ uint32_t getBitLength(BigInt n) {
 BigInt abs(BigInt n)
 {
 	BigInt res = n;
-	if (res.isNegative()) res = ~res;
+	if (res.isNegative()) res = twoComplement(n);
 	return res;
 }
 
@@ -534,60 +551,76 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 	if (b == 0) return;
 
 	//? Nếu hai số khác dấu thì kết quả sẽ là âm
-	bool isResNegative = a.isNegative() != b.isNegative();
+	bool isResultNegative = a.isNegative() != b.isNegative();
+	bool isDivided = false;
 
 	q = 0;
 	a = abs(a);
 	b = abs(b);
 
-	// Ví dụ
-	// 10011111
-	// 00001100
-
+	//? Lấy chênh lệch độ dài bit của hai số
 	int32_t bBitLength = getBitLength(b);
-	int32_t deltaBitLength = getBitLength(a) - bBitLength; // Chênh lệch độ dài bit của hai số là 4
+	int32_t deltaBitLength = getBitLength(a) - bBitLength;
 
-	//? Lặp đến khi độ dài bit của hai số giống nhau
+	//? Lặp đến khi độ dài bit của hai số giống nhau (chênh lệch = 0)
 	while (deltaBitLength > 1)
 	{
-		deltaBitLength -= 1; // Chênh lệch còn 1
-		BigInt p = 1; // 0000 0001
-		//p << deltaBitLength; // p = 0000 0010
+		deltaBitLength -= 1;
+		BigInt one = 1;
 
 		//? Cộng vào q ở vị trí delta giá trị 1 (delta giảm dần đến 0)
-		q = q + (p << deltaBitLength); // q = 0000 1100
+		q = q + (one << deltaBitLength);
 
-		//? Dịch vị trí của b sang trái delta vị trí
-		//? và trừ vào số bị chia (a)
-		a = a - (b << deltaBitLength); // b = 0001 1000
-		// a = 0010 0111 - 0001 1000 = 0000 1111
+		//? Dịch vị trí của b sang trái delta vị trí và trừ vào số bị chia (số a)
+		a = a - (b << deltaBitLength);
 
-		deltaBitLength = getBitLength(a) - bBitLength; // chênh lệch độ dài là 4 - 4 = 0 => kết thúc
+		deltaBitLength = getBitLength(a) - bBitLength;
+
+		isDivided = true;
 	}
 
 	//? Chia lần cuối cùng (kết quả nằm ở vị trí 0)
 	while (a >= b)
 	{
-		BigInt one = 1;
-
 		//? Cộng giá trị 1 vào thương rồi trừ số bị chia cho số chia
-		q = q + one; // q = 0000 0100
-		a = a - b; // a  = 0000 0100
+		q = q + 1;
+		a = a - b;
+
+		isDivided = true;
 	}
 
-	if (isResNegative) q = ~q;
-
+	//? Phần dư
 	r = a;
+
+	//? Lấy bù 2 nếu là số âm
+	if (isResultNegative)
+	{
+		q = twoComplement(q);
+
+		//? Nếu có thực hiện phép chia thì chuyển số dư thành dạng bù 2
+		if (isDivided)
+			r = twoComplement(a);
+	}
 }
 
 BigInt operator/(BigInt a, BigInt b)
 {
-	BigInt q = 0;
 	BigInt r;
+	BigInt q = 0;
 
 	division(a, b, q, r);
 
 	io.writeOutputs(a, b, q, " / ");
-
 	return q;
+}
+
+BigInt operator%(BigInt a, BigInt b)
+{
+	BigInt q;
+	BigInt r = 0;
+
+	division(a, b, q, r);
+
+	io.writeOutputs(a, b, r, " % ");
+	return r;
 }

@@ -84,6 +84,7 @@ public:
 	bool isNegative();
 	bool isOdd();
 	bool isEven();
+	bool isZero();
 };
 
 void removeLastBytesIfNull(BigInt& n);
@@ -131,3 +132,4 @@ BigInt operator *(BigInt a, BigInt b);
 BigInt operator~(BigInt a);
 
 BigInt operator/(BigInt a, BigInt b);
+BigInt operator%(BigInt a, BigInt b);
