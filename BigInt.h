@@ -89,6 +89,8 @@ byte getLastByte(const BigInt& n);
 
 void removeLastBytesIfNull(BigInt& n, int preserve = 1);
 
+uint32_t getBitLength(BigInt n);
+
 void addMoreBytes(BigInt& n, int amount);
 
 BigInt abs(BigInt n);

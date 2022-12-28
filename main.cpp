@@ -11,8 +11,6 @@ using namespace std::chrono;
 
 vector<tuple<BigInt, BigInt>> testCases;
 
-BigIntRandom* random = BigIntRandom::getInstance();
-
 steady_clock::time_point start;
 
 void startClock(steady_clock::time_point& start)
@@ -57,10 +55,10 @@ void ioTest(BigInt a) {
 
 void randomTest(int bitCount) {
 	BigInt numA = random->next(bitCount);
-	io.writeOutput(converter.bigIntToBinaryStr(numA));
+	io.writeOutput(converter.bigIntToDecimalStr(numA));
 
 	BigInt numB = random->next(numA);
-	io.writeOutput(converter.bigIntToBinaryStr(numB));
+	io.writeOutput(converter.bigIntToDecimalStr(numB));
 
 	cout << (numA < numB) << endl;
 }
@@ -72,9 +70,15 @@ void algoTest(BigInt a, BigInt b)
 	//res = Algorithm::gcd(a, b);
 	//io.writeOutputs(a, b, res, " gcd ");
 
-	BigInt m = converter.decimalStrToBigInt("9674057963");
-	res = Algorithm::powMod(a, b, m);
-	io.writeOutputs(a, b, res, " powMod ");
+	//BigInt m = converter.decimalStrToBigInt("9674057963");
+	//res = Algorithm::powMod(a, b, m);
+	//io.writeOutputs(a, b, res, " powMod ");
+
+	BigInt n = random->next(512);
+	io.writeOutput(converter.bigIntToDecimalStr(n));
+
+	string isNPrime = Algorithm::isPrime(n) ? "yes" : "no";
+	io.writeOutput("Is prime: " + isNPrime);
 }
 
 void test()
@@ -91,7 +95,6 @@ void test()
 		//ioTest(a);
 		//ioTest(b);
 		//randomTest(512);
-
 		algoTest(a, b);
 	}
 }

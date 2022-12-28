@@ -24,3 +24,5 @@ public:
 	BigInt next(uint32_t bitCount);
 	BigInt next(BigInt n);
 };
+
+static BigIntRandom* random = BigIntRandom::getInstance();

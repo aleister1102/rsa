@@ -134,6 +134,7 @@ string BigIntConverter::bigIntToBinaryStr(BigInt n)
 	return res;
 }
 
+// WARNING: thuật toán chuyển qua lại giữa BigInt và thập phân khá chậm, hạn chế dùng
 string BigIntConverter::bigIntToDecimalStr(BigInt n)
 {
 	//cout << "Converting to decimal string..." << endl;
