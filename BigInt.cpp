@@ -351,7 +351,7 @@ BigInt operator<<(BigInt n, int steps)
 	BigInt res = n;
 
 	// UNDONE: cần đảm bảo rằng việc cấp phát thêm byte là cần thiết
-	addMoreBytes(res, byteDistance + (bitDistance ? 1 : 0));
+	addMoreBytes(res, byteDistance + (bitDistance ? 1 : 0)); // Thêm byte mở rộng
 
 	if (byteDistance)
 	{

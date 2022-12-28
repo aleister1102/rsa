@@ -13,7 +13,7 @@ public:
 	void clearFile(string filename);
 
 	void readInputs(vector<tuple<BigInt, BigInt>>& testCases);
-	void readBinaryOutputs(vector<tuple<BigInt, BigInt>>& testCases);
+	void readBinaryInputs(vector<tuple<BigInt, BigInt>>& testCases);
 
 	void writeOutput(string output);
 	void writeOutputs(BigInt a, BigInt b, BigInt res, string op);

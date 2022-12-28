@@ -55,10 +55,10 @@ void ioTest(BigInt a) {
 
 void randomTest(int bitCount) {
 	BigInt numA = random->next(bitCount);
-	io.writeOutput(converter.bigIntToDecimalStr(numA));
+	io.writeOutput(converter.bigIntToBinaryStr(numA));
 
 	BigInt numB = random->next(numA);
-	io.writeOutput(converter.bigIntToDecimalStr(numB));
+	io.writeOutput(converter.bigIntToBinaryStr(numB));
 
 	cout << (numA < numB) << endl;
 }
@@ -70,12 +70,12 @@ void algoTest(BigInt a, BigInt b)
 	//res = Algorithm::gcd(a, b);
 	//io.writeOutputs(a, b, res, " gcd ");
 
-	BigInt m = converter.binaryStrToBigInt("450044376402256110986693418469");
+	BigInt m = converter.decimalStrToBigInt("450044376402256110986693418469");
 	res = Algorithm::powMod(a, b, m);
 	io.writeOutputs(a, b, res, " powMod ");
 }
 
-void testWithInputs()
+void test()
 {
 	io.readInputs(testCases);
 
@@ -96,10 +96,6 @@ void testWithoutInputs()
 {
 	for (int i = 0; i < 10; i++)
 	{
-		BigInt res = 1;
-
-		BigInt n = random->next(128);
-		io.writeOutput(converter.bigIntToBinaryStr(n));
 	}
 }
 
@@ -107,7 +103,8 @@ int main()
 {
 	io.clearFile("output.txt");
 	io.clearFile("log.txt");
-	testWithInputs();
-	//testWithoutInputs();
+
+	test();
+
 	return 0;
 }

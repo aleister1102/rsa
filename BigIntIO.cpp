@@ -37,7 +37,7 @@ void BigIntIO::readInputs(vector<tuple<BigInt, BigInt>>& testCases)
 	f.close();
 }
 
-void BigIntIO::readBinaryOutputs(vector<tuple<BigInt, BigInt>>& testCases)
+void BigIntIO::readBinaryInputs(vector<tuple<BigInt, BigInt>>& testCases)
 {
 	fstream f("input.txt", ios::in);
 	string numberA, numberB;
