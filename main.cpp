@@ -70,20 +70,13 @@ void algoTest(BigInt a, BigInt b)
 	//res = Algorithm::gcd(a, b);
 	//io.writeOutputs(a, b, res, " gcd ");
 
-	//BigInt m = converter.decimalStrToBigInt("9674057963");
-	//res = Algorithm::powMod(a, b, m);
-	//io.writeOutputs(a, b, res, " powMod ");
-
-	BigInt n = random->next(512);
-	io.writeOutput(converter.bigIntToDecimalStr(n));
-
-	string isNPrime = Algorithm::isPrime(n) ? "yes" : "no";
-	io.writeOutput("Is prime: " + isNPrime);
+	BigInt m = converter.binaryStrToBigInt("450044376402256110986693418469");
+	res = Algorithm::powMod(a, b, m);
+	io.writeOutputs(a, b, res, " powMod ");
 }
 
-void test()
+void testWithInputs()
 {
-	io.clearOutputs();
 	io.readInputs(testCases);
 
 	for (int i = 0; i < testCases.size(); i++)
@@ -99,9 +92,22 @@ void test()
 	}
 }
 
+void testWithoutInputs()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		BigInt res = 1;
+
+		BigInt n = random->next(128);
+		io.writeOutput(converter.bigIntToBinaryStr(n));
+	}
+}
+
 int main()
 {
-	test();
-
+	io.clearFile("output.txt");
+	io.clearFile("log.txt");
+	testWithInputs();
+	//testWithoutInputs();
 	return 0;
 }

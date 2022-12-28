@@ -29,7 +29,7 @@ BigInt Algorithm::gcd(BigInt a, BigInt b)
 
 BigInt Algorithm::powMod(BigInt n, BigInt e, BigInt m)
 {
-	//cout << "[Algorithm::powMod] Calculate powMod\n";
+	io.writeLog("[Algorithm::powMod] Calculate powMod");
 
 	BigInt res = 1;
 	n = abs(n);
@@ -43,6 +43,7 @@ BigInt Algorithm::powMod(BigInt n, BigInt e, BigInt m)
 		e >>= 1;
 	}
 
+	io.writeLog("[Algorithm::powMod] Finish calculating powMod");
 	return res;
 }
 

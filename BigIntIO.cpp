@@ -6,9 +6,9 @@ using std::ios;
 using std::fstream;
 using std::make_tuple;
 
-void BigIntIO::clearOutputs()
+void BigIntIO::clearFile(string filename)
 {
-	fstream f("output.txt", ios::out);
+	fstream f(filename, ios::out);
 	f.close();
 }
 
@@ -33,6 +33,41 @@ void BigIntIO::readInputs(vector<tuple<BigInt, BigInt>>& testCases)
 			testCases.push_back(make_tuple(a, b));
 		}
 	}
+
+	f.close();
+}
+
+void BigIntIO::readBinaryOutputs(vector<tuple<BigInt, BigInt>>& testCases)
+{
+	fstream f("input.txt", ios::in);
+	string numberA, numberB;
+
+	if (f.is_open())
+	{
+		while (!f.eof())
+		{
+			f >> numberA;
+			f >> numberB;
+
+			if (numberA == "" || numberB == "")
+				continue;
+
+			BigInt a = converter.binaryStrToBigInt(numberA);
+			BigInt b = converter.binaryStrToBigInt(numberB);
+
+			testCases.push_back(make_tuple(a, b));
+		}
+	}
+
+	f.close();
+}
+
+void BigIntIO::writeOutput(string output)
+{
+	fstream f("output.txt", ios::app);
+
+	f << output << endl;
+
 	f.close();
 }
 
@@ -63,11 +98,25 @@ void BigIntIO::writeOutputs(BigInt a, int b, BigInt res, string op)
 	f.close();
 }
 
-void BigIntIO::writeOutput(string output)
+void BigIntIO::writeBinaryOutputs(BigInt a, BigInt b, BigInt res, string op)
 {
 	fstream f("output.txt", ios::app);
 
-	f << output << endl;
+	f << converter.bigIntToBinaryStr(a)
+		<< op
+		<< converter.bigIntToBinaryStr(b)
+		<< " = "
+		<< converter.bigIntToBinaryStr(res)
+		<< endl;
+
+	f.close();
+}
+
+void BigIntIO::writeLog(string log)
+{
+	fstream f("log.txt", ios::app);
+
+	f << log << endl;
 
 	f.close();
 }
