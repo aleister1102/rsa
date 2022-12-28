@@ -1,6 +1,10 @@
 #include "BigIntConverter.h"
 #include "BigIntIO.h"
 
+using std::cout;
+using std::endl;
+using std::exception;
+
 string reverseString(string str)
 {
 	reverse(str.begin(), str.end());
@@ -20,7 +24,7 @@ string removeSpaces(string str)
 	return res;
 }
 
-char intToDigit(int value)
+char BigIntConverter::intToDigit(int value)
 {
 	char digit;
 
@@ -29,7 +33,7 @@ char intToDigit(int value)
 	return digit;
 }
 
-int digitToInt(char digit)
+int BigIntConverter::digitToInt(char digit)
 {
 	int value;
 
@@ -110,14 +114,20 @@ BigInt BigIntConverter::binaryStrToBigInt(string binStr)
 
 string BigIntConverter::bigIntToBinaryStr(BigInt n)
 {
-	//removeLastBytesIfNull(n, 2);
+	//cout << "Converting to binary string..." << endl;
 
 	string res;
-
-	for (int i = n.byteCount - 1; i >= 0; i--)
+	try
 	{
-		string str = BigIntConverter::byteToString(n.bytes[i], true);
-		res += str + " ";
+		for (int i = n.byteCount - 1; i >= 0; i--)
+		{
+			string str = BigIntConverter::byteToString(n.bytes[i], true);
+			res += str;
+		}
+	}
+	catch (exception ex)
+	{
+		cout << ex.what() << endl;
 	}
 
 	return res;
@@ -125,11 +135,12 @@ string BigIntConverter::bigIntToBinaryStr(BigInt n)
 
 string BigIntConverter::bigIntToDecimalStr(BigInt n)
 {
+	//cout << "Converting to decimal string..." << endl;
+
 	bool sign = n.isNegative();
 
-	BigInt i = abs(n), base = 10, r;
-
 	string res;
+	BigInt i = abs(n), base = 10, r;
 
 	// Tương tự như phép chuyển số thập phân sang chuỗi của kiểu int:
 	do {

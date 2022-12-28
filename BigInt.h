@@ -3,12 +3,10 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 typedef unsigned char byte;
 
 static byte ByteMask[8] = {
-	0b00000001,
+	byte(0b00000001),
 	0b00000010,
 	0b00000100,
 	0b00001000,
@@ -76,15 +74,15 @@ public:
 	}
 
 public:
+	int getIntValue();
 	bool isPositive();
 	bool isNegative();
 	bool isOdd();
 	bool isEven();
 	bool isZero();
-
-	/// Lấy ra giá trị 4 byte giá trị của một số bất kỳ
-	int getIntValue();
 };
+
+byte getLastByte(const BigInt& n);
 
 void removeLastBytesIfNull(BigInt& n, int preserve = 1);
 

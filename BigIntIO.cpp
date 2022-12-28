@@ -1,6 +1,11 @@
 #include "BigIntIO.h"
 #include <fstream>
 
+using std::endl;
+using std::ios;
+using std::fstream;
+using std::make_tuple;
+
 void BigIntIO::clearOutputs()
 {
 	fstream f("output.txt", ios::out);

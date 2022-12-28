@@ -66,6 +66,7 @@ bool BigInt::isZero()
 	return res;
 }
 
+/// Lấy ra giá trị 4 byte giá trị của một số bất kỳ
 int BigInt::getIntValue()
 {
 	int value = 0;
@@ -629,10 +630,10 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 		addMoreBytes(q, paddingByteCount);
 	}
 	//* Xóa byte thừa nếu số dư có nhiều hơn maxByteCount byte
-	else if (excessByteCount < 0)
-	{
-		removeLastBytes(r, -excessByteCount);
-	}
+	//else if (excessByteCount < 0)
+	//{
+	//	removeLastBytes(r, -excessByteCount);
+	//}
 }
 
 BigInt operator/(BigInt a, BigInt b)

@@ -1,10 +1,14 @@
 ﻿#pragma once
 #include "BigInt.h"
-using namespace std;
+
+using std::string;
 
 class BigIntConverter
 {
 public:
+	char intToDigit(int value);
+	int digitToInt(char digit);
+
 	byte stringToByte(string str);
 	string byteToString(byte number, bool isReversed = false);
 

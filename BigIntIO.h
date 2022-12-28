@@ -1,11 +1,11 @@
 #pragma once
 #include "BigInt.h"
 #include "BigIntConverter.h"
-
 #include <vector>
 #include <tuple>
 
-using namespace std;
+using std::vector;
+using std::tuple;
 
 class BigIntIO
 {
