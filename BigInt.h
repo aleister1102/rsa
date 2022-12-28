@@ -5,6 +5,8 @@
 
 typedef unsigned char byte;
 
+static byte zero;
+
 static byte ByteMask[8] = {
 	byte(0b00000001),
 	0b00000010,
@@ -86,6 +88,8 @@ byte getLastByte(const BigInt& n);
 
 void removeLastBytesIfNull(BigInt& n, int preserve = 1);
 
+void addMoreBytes(BigInt& n, int amount);
+
 BigInt abs(BigInt n);
 
 void division(BigInt a, BigInt b, BigInt& q, BigInt& r);
@@ -113,8 +117,6 @@ void operator >>= (BigInt& a, int steps);
 
 BigInt operator << (BigInt a, int steps);
 void operator <<= (BigInt& a, int steps);
-
-bool operator>(BigInt a, BigInt b);
 
 BigInt operator &(BigInt a, BigInt b);
 

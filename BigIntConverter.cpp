@@ -198,6 +198,9 @@ BigInt BigIntConverter::decimalStrToBigInt(string decStr)
 	{
 		d = digitToInt(decStr[0]);
 		res = res + d * i;
+
+		// Toán tử + tự động xóa đi những byte thừa, cần cấp phát lại
+		addMoreBytes(res, 1);
 	}
 
 	return res;

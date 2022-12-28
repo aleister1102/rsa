@@ -27,8 +27,8 @@ void BigIntIO::readInputs(vector<tuple<BigInt, BigInt>>& testCases)
 			if (numberA == "" || numberB == "")
 				continue;
 
-			BigInt a = converter.binaryStrToBigInt(numberA);
-			BigInt b = converter.binaryStrToBigInt(numberB);
+			BigInt a = converter.decimalStrToBigInt(numberA);
+			BigInt b = converter.decimalStrToBigInt(numberB);
 
 			testCases.push_back(make_tuple(a, b));
 		}
@@ -40,11 +40,11 @@ void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt res, string op)
 {
 	fstream f("output.txt", ios::app);
 
-	f << converter.bigIntToBinaryStr(a)
+	f << converter.bigIntToDecimalStr(a)
 		<< op
-		<< converter.bigIntToBinaryStr(b)
+		<< converter.bigIntToDecimalStr(b)
 		<< " = "
-		<< converter.bigIntToBinaryStr(res)
+		<< converter.bigIntToDecimalStr(res)
 		<< endl;
 
 	f.close();
@@ -54,16 +54,16 @@ void BigIntIO::writeOutputs(BigInt a, int b, BigInt res, string op)
 {
 	fstream f("output.txt", ios::app);
 
-	f << converter.bigIntToBinaryStr(a)
+	f << converter.bigIntToDecimalStr(a)
 		<< op
 		<< b
 		<< " = "
-		<< converter.bigIntToBinaryStr(res) << endl;
+		<< converter.bigIntToDecimalStr(res) << endl;
 
 	f.close();
 }
 
-void BigIntIO::writeOuput(string output)
+void BigIntIO::writeOutput(string output)
 {
 	fstream f("output.txt", ios::app);
 

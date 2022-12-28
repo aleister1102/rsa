@@ -1,6 +1,7 @@
 ﻿#include "BigInt.h"
 #include "BigIntIO.h"
 #include "BigIntRandom.h"
+#include "Algorithm.h"
 #include <chrono>
 
 using std::cout;
@@ -47,21 +48,27 @@ void operatorTest(BigInt a, BigInt b) {
 }
 
 void ioTest(BigInt a) {
-	string decStr = converter.bigIntToDecimalStr(a);
-	BigInt n = converter.decimalStrToBigInt(decStr);
-	string binStr = converter.bigIntToBinaryStr(n);
+	io.writeOutput("Bin: " + converter.bigIntToBinaryStr(a));
 
-	io.writeOuput(binStr);
+	string decStr = converter.bigIntToDecimalStr(a);
+
+	io.writeOutput("Dec: " + decStr);
 }
 
 void randomTest(int bitCount) {
 	BigInt numA = random->next(bitCount);
-	io.writeOuput(converter.bigIntToBinaryStr(numA));
+	io.writeOutput(converter.bigIntToBinaryStr(numA));
 
 	BigInt numB = random->next(numA);
-	io.writeOuput(converter.bigIntToBinaryStr(numB));
+	io.writeOutput(converter.bigIntToBinaryStr(numB));
 
 	cout << (numA < numB) << endl;
+}
+
+void algoTest(BigInt a, BigInt b)
+{
+	BigInt g = Algorithm::gcd(a, b);
+	io.writeOutputs(a, b, g, " gcd ");
 }
 
 void test()
@@ -77,8 +84,9 @@ void test()
 		//operatorTest(a, b);
 		//ioTest(a);
 		//ioTest(b);
+		//randomTest(512);
 
-		randomTest(512);
+		algoTest(a, b);
 	}
 }
 

@@ -32,27 +32,27 @@ byte getFirstBit(const BigInt& n)
 bool BigInt::isPositive()
 {
 	byte lastBit = getLastBit(*this);
-	bool res = !this->isZero() && lastBit == 0; // khác 0 và có bit cuối là 0
+	bool res = !this->isZero() && lastBit == zero; // khác zero và có bit cuối là 0
 	return  res;
 }
 
 bool BigInt::isNegative()
 {
 	byte lastBit = getLastBit(*this);
-	bool res = !this->isZero() && lastBit != 0; // khác 0 và có bit cuối khác 0
+	bool res = !this->isZero() && lastBit != zero; // khác 0 và có bit cuối khác 0
 	return res;
 }
 
 bool BigInt::isOdd()
 {
 	byte firstBit = getFirstBit(*this);
-	return firstBit != 0;
+	return firstBit != zero;
 }
 
 bool BigInt::isEven()
 {
 	byte firstBit = getFirstBit(*this);
-	return firstBit == 0;
+	return firstBit == zero;
 }
 
 bool BigInt::isZero()
@@ -61,7 +61,7 @@ bool BigInt::isZero()
 	removeLastBytesIfNull(temp);
 
 	bool res = false;
-	if (temp.byteCount == 1 && temp.bytes[0] == 0)
+	if (temp.byteCount == 1 && temp.bytes[0] == zero)
 		res = true;
 	return res;
 }
@@ -114,7 +114,7 @@ void addMoreBytes(BigInt& n, int amount)
 	for (int i = 0; i < amount; i++)
 	{
 		if (n.bytes)
-			n.bytes[paddingPosition + i] = 0;
+			n.bytes[paddingPosition + i] = zero;
 	}
 }
 
@@ -122,7 +122,7 @@ void removeLastBytesIfNull(BigInt& n, int preserve)
 {
 	byte lastByte = getLastByte(n);
 
-	while (lastByte == 0 && n.byteCount > preserve) // preserve là số byte tối thiểu được phép giữ lại
+	while (lastByte == zero && n.byteCount > preserve) // preserve là số byte tối thiểu được phép giữ lại
 	{
 		n.byteCount -= 1;
 		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
@@ -642,7 +642,7 @@ BigInt operator/(BigInt a, BigInt b)
 
 	division(a, b, q, r);
 
-	io.writeOutputs(a, b, q, " / ");
+	//io.writeOutputs(a, b, q, " / ");
 	return q;
 }
 
@@ -652,6 +652,6 @@ BigInt operator%(BigInt a, BigInt b)
 
 	division(a, b, q, r);
 
-	io.writeOutputs(a, b, r, " % ");
+	//io.writeOutputs(a, b, r, " % ");
 	return r;
 }

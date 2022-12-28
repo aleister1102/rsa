@@ -16,7 +16,7 @@ public:
 
 	void writeOutputs(BigInt a, BigInt b, BigInt res, string op);
 	void writeOutputs(BigInt a, int b, BigInt res, string op);
-	void writeOuput(string output);
+	void writeOutput(string output);
 };
 
 static BigIntIO io;
