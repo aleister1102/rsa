@@ -75,6 +75,7 @@ string BigIntConverter::byteToString(byte n, bool isReversed)
 	return res;
 }
 
+// TODO: cần có những hàm kiểm tra tính hợp lệ của chuỗi đầu vào
 BigInt BigIntConverter::binaryStrToBigInt(string binStr)
 {
 	int length = binStr.length();
@@ -167,6 +168,7 @@ string BigIntConverter::bigIntToDecimalStr(BigInt n)
 	return res;
 }
 
+// BUG: số âm đang được đọc thành số dương
 BigInt BigIntConverter::decimalStrToBigInt(string decStr)
 {
 	BigInt res = 0;
@@ -198,9 +200,6 @@ BigInt BigIntConverter::decimalStrToBigInt(string decStr)
 	{
 		d = digitToInt(decStr[0]);
 		res = res + d * i;
-
-		// Toán tử + tự động xóa đi những byte thừa, cần cấp phát lại
-		addMoreBytes(res, 1);
 	}
 
 	return res;

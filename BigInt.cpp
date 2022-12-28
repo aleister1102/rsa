@@ -185,6 +185,7 @@ BigInt twoComplement(BigInt n)
 	return res;
 }
 
+// TODO: đảm bảo rằng không cần cắt bớt byte rỗng ở cuối
 BigInt operator+(BigInt a, BigInt b)
 {
 	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
@@ -213,7 +214,7 @@ BigInt operator+(BigInt a, BigInt b)
 	}
 
 	// Bỏ bớt byte thừa nếu rỗng
-	removeLastBytesIfNull(res);
+	//removeLastBytesIfNull(res);
 
 	//io.writeOutputs(a, b, res, " + ");
 
@@ -349,8 +350,8 @@ BigInt operator<<(BigInt n, int steps)
 	int bitDistance = steps % 8;
 	BigInt res = n;
 
-	// Thêm byte mở rộng
-	addMoreBytes(res, byteDistance + (bitDistance ? 1 : 0));
+	// UNDONE: cần đảm bảo rằng việc cấp phát thêm byte là cần thiết
+	addMoreBytes(res, byteDistance + (bitDistance ? 1 : 0)); // Thêm byte mở rộng
 
 	if (byteDistance)
 	{
@@ -630,10 +631,10 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 		addMoreBytes(q, paddingByteCount);
 	}
 	//* Xóa byte thừa nếu số dư có nhiều hơn maxByteCount byte
-	//else if (excessByteCount < 0)
-	//{
-	//	removeLastBytes(r, -excessByteCount);
-	//}
+	else if (excessByteCount < 0)
+	{
+		removeLastBytes(r, -excessByteCount);
+	}
 }
 
 BigInt operator/(BigInt a, BigInt b)

@@ -67,8 +67,14 @@ void randomTest(int bitCount) {
 
 void algoTest(BigInt a, BigInt b)
 {
-	BigInt g = Algorithm::gcd(a, b);
-	io.writeOutputs(a, b, g, " gcd ");
+	BigInt res = 1;
+
+	//res = Algorithm::gcd(a, b);
+	//io.writeOutputs(a, b, res, " gcd ");
+
+	BigInt m = converter.decimalStrToBigInt("9674057963");
+	res = Algorithm::powMod(a, b, m);
+	io.writeOutputs(a, b, res, " powMod ");
 }
 
 void test()

@@ -25,3 +25,20 @@ BigInt Algorithm::gcd(BigInt a, BigInt b)
 
 	return b;
 }
+
+BigInt Algorithm::powMod(BigInt n, BigInt e, BigInt m)
+{
+	BigInt res = 1;
+	n = abs(n);
+	e = abs(e);
+
+	while (e.isPositive()) {
+		if (e.isOdd())
+			res = (res * n) % m;
+
+		n = (n * n) % m;
+		e >>= 1;
+	}
+
+	return res;
+}

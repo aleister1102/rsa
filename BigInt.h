@@ -33,6 +33,7 @@ public:
 		memset(bytes, 0, byteCount * sizeof(byte));
 	}
 
+	// TODO: giảm số lần gọi constructor nhiều nhất có thể
 	BigInt(const BigInt& other) : bytes(nullptr), byteCount(0)
 	{
 		*this = other;
