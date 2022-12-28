@@ -23,23 +23,22 @@ class BigInt
 public:
 	byte* bytes;
 	uint32_t byteCount;
-	bool fixedByteCount;
 
 public:
-	BigInt() : bytes(nullptr), byteCount(0), fixedByteCount(false) {}
+	BigInt() : bytes(nullptr), byteCount(0) {}
 
-	BigInt(uint32_t initByteCount) : fixedByteCount(false) {
+	BigInt(uint32_t initByteCount) {
 		byteCount = initByteCount;
 		bytes = (byte*)malloc(byteCount * sizeof(byte));
 		memset(bytes, 0, byteCount * sizeof(byte));
 	}
 
-	BigInt(const BigInt& other) : bytes(nullptr), byteCount(0), fixedByteCount(false)
+	BigInt(const BigInt& other) : bytes(nullptr), byteCount(0)
 	{
 		*this = other;
 	}
 
-	BigInt(int value) : bytes(nullptr), byteCount(0), fixedByteCount(false)
+	BigInt(int value) : bytes(nullptr), byteCount(0)
 	{
 		*this = value;
 	}
@@ -82,6 +81,9 @@ public:
 	bool isOdd();
 	bool isEven();
 	bool isZero();
+
+	/// Lấy ra giá trị 4 byte giá trị của một số bất kỳ
+	int getIntValue();
 };
 
 void removeLastBytesIfNull(BigInt& n, int preserve = 1);
@@ -90,7 +92,7 @@ BigInt abs(BigInt n);
 
 void division(BigInt a, BigInt b, BigInt& q, BigInt& r);
 
-int32_t getValue(BigInt n);
+BigInt twoComplement(BigInt n);
 
 BigInt operator + (BigInt a, BigInt b);
 BigInt operator + (BigInt a, int value);

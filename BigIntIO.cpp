@@ -34,20 +34,35 @@ void BigIntIO::readInputs(vector<tuple<BigInt, BigInt>>& testCases)
 void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt res, string op)
 {
 	fstream f("output.txt", ios::app);
-	f << converter.bigIntToBinaryStr(a) << op << converter.bigIntToBinaryStr(b) << " = " << converter.bigIntToBinaryStr(res) << endl;
+
+	f << converter.bigIntToBinaryStr(a)
+		<< op
+		<< converter.bigIntToBinaryStr(b)
+		<< " = "
+		<< converter.bigIntToBinaryStr(res)
+		<< endl;
+
 	f.close();
 }
 
 void BigIntIO::writeOutputs(BigInt a, int b, BigInt res, string op)
 {
 	fstream f("output.txt", ios::app);
-	f << converter.bigIntToBinaryStr(a) << op << b << " = " << converter.bigIntToBinaryStr(res) << endl;
+
+	f << converter.bigIntToBinaryStr(a)
+		<< op
+		<< b
+		<< " = "
+		<< converter.bigIntToBinaryStr(res) << endl;
+
 	f.close();
 }
 
 void BigIntIO::writeOuput(string output)
 {
 	fstream f("output.txt", ios::app);
+
 	f << output << endl;
+
 	f.close();
 }

@@ -12,6 +12,7 @@ public:
 	string bigIntToBinaryStr(BigInt number);
 
 	string bigIntToDecimalStr(BigInt n);
+	BigInt decimalStrToBigInt(string str);
 };
 
 static BigIntConverter converter;

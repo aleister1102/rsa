@@ -20,6 +20,24 @@ string removeSpaces(string str)
 	return res;
 }
 
+char intToDigit(int value)
+{
+	char digit;
+
+	digit = '0' + value;
+
+	return digit;
+}
+
+int digitToInt(char digit)
+{
+	int value;
+
+	value = digit - '0';
+
+	return value;
+}
+
 byte BigIntConverter::stringToByte(string str)
 {
 	byte res = 0;
@@ -30,7 +48,7 @@ byte BigIntConverter::stringToByte(string str)
 		res = res << 1;
 
 		// Thêm bit vào cuối
-		res += bit - '0';
+		res += digitToInt(bit);
 	}
 
 	return res;
@@ -43,7 +61,7 @@ string BigIntConverter::byteToString(byte n, bool isReversed)
 	for (int i = 0; i < 8; i++)
 	{
 		// Lấy bit thứ i
-		res += to_string(n & 1);
+		res += intToDigit(n & 1);
 
 		// Dịch dãy các bits sang một bit để lấy bit tiếp theo
 		n >>= 1;
@@ -53,9 +71,9 @@ string BigIntConverter::byteToString(byte n, bool isReversed)
 	return res;
 }
 
-BigInt BigIntConverter::binaryStrToBigInt(string str)
+BigInt BigIntConverter::binaryStrToBigInt(string binStr)
 {
-	int length = str.length();
+	int length = binStr.length();
 	int offset = length;
 	int byteCount = length / 8 + (length % 8 != 0);
 
@@ -72,9 +90,9 @@ BigInt BigIntConverter::binaryStrToBigInt(string str)
 		{
 			// Tách các byte từ phải qua
 			if (length - 8 >= 0)
-				byteStr = str.substr(offset - 8, 8);
+				byteStr = binStr.substr(offset - 8, 8);
 			else
-				byteStr = str.substr(0, length);
+				byteStr = binStr.substr(0, length);
 
 			res.bytes[i] = BigIntConverter::stringToByte(byteStr);
 		}
@@ -105,47 +123,70 @@ string BigIntConverter::bigIntToBinaryStr(BigInt n)
 	return res;
 }
 
-void insertCharFrontStr(char** str, int* strLen, char chr) {
-	(*strLen)++;
-	(*str) = (char*)realloc((*str), (*strLen) + 1);
-	memcpy_s((*str) + 1, (*strLen), (*str), (*strLen));
-	(*str)[0] = chr;
-}
-
-char intToDigit(int32_t value)
-{
-	char digit;
-
-	digit = '0' + value;
-
-	return digit;
-}
-
 string BigIntConverter::bigIntToDecimalStr(BigInt n)
 {
 	bool sign = n.isNegative();
 
-	//? Tại sao lại cần lấy giá trị tuyệt đối của n
 	BigInt i = abs(n), base = 10, r;
 
 	string res;
 
+	// Tương tự như phép chuyển số thập phân sang chuỗi của kiểu int:
 	do {
-		//* Lấy i chia cho cơ số là 10
+		// Lấy i chia cho cơ số là 10
 		division(i, base, i, r);
 
-		//* Lấy số dư, số dư lớn nhất là 9
-		int32_t value = getValue(r);
+		// Đảm bảo kết quả của phép chia luôn dương
+		i = abs(i);
 
-		//* Chuyển thành dạng chữ số
+		// Lấy giá trị của số dư (max = 9)
+		int value = r.getIntValue();
+
+		// Chuyển thành dạng chữ số
 		char digit = intToDigit(value);
 
-		//* Cộng vào phía trước chuỗi
+		// Cộng vào phía trước chuỗi
 		res = digit + res;
 	} while (i > 0);
 
 	if (sign == 1) {
 		res = "-" + res;
+	}
+
+	return res;
+}
+
+BigInt BigIntConverter::decimalStrToBigInt(string decStr)
+{
+	BigInt res = 0;
+
+	int length = decStr.length();
+	if (length == 0) return res;
+
+	BigInt d = 0;
+	BigInt i = 1;
+	BigInt base = 10;
+
+	// Tương tự như phép chuyển chuỗi sang số thập phân của kiểu int:
+	// lặp qua từng chữ số d ở vị trí j (j giảm dần)
+	// và cộng res cho d * i (i = 10^(length - 1 - j)).
+	for (int j = length - 1; j > 0; j--)
+	{
+		d = digitToInt(decStr[j]);
+		res = res + d * i;
+		i = i * base;
+	}
+
+	// Nếu ký tự đầu là dấu trừ thì lấy bù 2
+	if (decStr[0] == '-')
+	{
+		res = twoComplement(res);
+	}
+	// ngược lại thì res = res + d * i
+	else
+	{
+		d = digitToInt(decStr[0]);
+		res = res + d * i;
 	}
 
 	return res;

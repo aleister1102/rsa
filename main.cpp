@@ -10,8 +10,8 @@ vector<tuple<BigInt, BigInt>> testCases;
 void operatorTest(BigInt a, BigInt b)
 {
 	a / b;
-	a% b;
 #if 0
+	a% b;
 	a* b;
 	a < b;
 	a > b;
@@ -28,11 +28,11 @@ void operatorTest(BigInt a, BigInt b)
 
 void ioTest(BigInt a)
 {
-	string binStr = converter.bigIntToBinaryStr(a);
-	io.writeOuput(binStr);
-
 	string decStr = converter.bigIntToDecimalStr(a);
-	io.writeOuput(decStr);
+	BigInt n = converter.decimalStrToBigInt(decStr);
+	string binStr = converter.bigIntToBinaryStr(n);
+
+	io.writeOuput(binStr);
 }
 
 void test()
@@ -46,7 +46,7 @@ void test()
 		tie(a, b) = testCase;
 
 		//operatorTest(a, b);
-		ioTest(a);
+		//ioTest(a);
 		ioTest(b);
 	}
 }
@@ -54,5 +54,6 @@ void test()
 int main()
 {
 	test();
+
 	return 0;
 }

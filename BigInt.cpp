@@ -66,6 +66,21 @@ bool BigInt::isZero()
 	return res;
 }
 
+int BigInt::getIntValue()
+{
+	int value = 0;
+	BigInt absNum = abs(*this);
+
+	/// Nếu kích thước lớn hơn 4 byte thì chỉ lấy 4 byte
+	uint32_t valueBytesCount = absNum.byteCount > 4 ? 4 : absNum.byteCount;
+
+	for (uint32_t i = 0; i < valueBytesCount; i++) {
+		value += absNum.bytes[i] * ((int)pow(256, i)); /// mỗi byte sẽ có cơ số là 256
+	}
+
+	return value;
+}
+
 byte getBit(byte n, int index)
 {
 	return (n >> index) & ByteMask[0];
@@ -196,7 +211,7 @@ BigInt operator+(BigInt a, BigInt b)
 		res.bytes[res.byteCount - 1] += 1;
 	}
 
-	// Xóa byte thừa nếu rỗng
+	// Bỏ bớt byte thừa nếu rỗng
 	removeLastBytesIfNull(res);
 
 	//io.writeOutputs(a, b, res, " + ");
@@ -638,19 +653,4 @@ BigInt operator%(BigInt a, BigInt b)
 
 	io.writeOutputs(a, b, r, " % ");
 	return r;
-}
-
-// TODO: understand
-int32_t getValue(BigInt n)
-{
-	int32_t value = 0;
-	BigInt nAbs = abs(n);
-
-	uint32_t valueBytesCount = nAbs.byteCount > 4 ? 4 : nAbs.byteCount;
-
-	for (uint32_t i = 0; i < valueBytesCount; i++) {
-		value += nAbs.bytes[i] * ((int32_t)pow(256, i));
-	}
-
-	return value;
 }
