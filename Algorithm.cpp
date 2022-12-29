@@ -114,7 +114,7 @@ bool Algorithm::isPrime(BigInt n, int k)
 
 	for (int i = 1; i <= k; i++)
 	{
-		io.writeLog("[Algorithm::isPrime] Test: " + std::to_string(i + 1));
+		io.writeLog("[Algorithm::isPrime] Test: " + std::to_string(i));
 
 		if (millerRabinTest(n, d) == false)
 			return false;

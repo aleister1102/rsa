@@ -2,7 +2,6 @@
 #include "BigIntConverter.h"
 #include "BigIntIO.h"
 
-
 uint32_t getMaxByteCount(uint32_t a, uint32_t b)
 {
 	return a > b ? a : b;
@@ -227,7 +226,7 @@ BigInt operator+(BigInt a, BigInt b)
 		res.bytes[res.byteCount - 1] += 1;
 	}
 
-	// TODO: bỏ bớt byte thừa khi
+	// TODO: bỏ bớt byte thừa khi kết quả có số byte vượt quá 2 * MAXBYTE byte
 	removeExceedingByte(res);
 
 	//io.writeOutputs(a, b, res, " + ");
@@ -634,21 +633,6 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 		//* Nếu có thực hiện phép chia thì chuyển số dư thành dạng bù 2
 		if (isDivided)
 			r = twoComplement(a);
-	}
-
-	int32_t paddingByteCount = maxByteCount - q.byteCount;
-	int32_t excessByteCount = r.byteCount - maxByteCount;
-
-	// WARN: kiểm soát việc cấp phát thêm byte
-	//* Thêm byte đệm nếu thương số có ít hơn maxByteCount byte
-	if (paddingByteCount > 0)
-	{
-		//addMoreBytes(q, paddingByteCount);
-	}
-	//* Xóa byte thừa nếu số dư có nhiều hơn maxByteCount byte
-	else if (excessByteCount > 0)
-	{
-		//removeLastBytes(r, excessByteCount);
 	}
 }
 
