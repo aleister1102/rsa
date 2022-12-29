@@ -118,6 +118,7 @@ void addMoreBytes(BigInt& n, int amount)
 	}
 }
 
+// REFACTOR: kiểm tra số byte rỗng và realloc 1 lần duy nhất
 void removeLastBytesIfNull(BigInt& n, int preserve)
 {
 	byte lastByte = getLastByte(n);
@@ -137,6 +138,18 @@ void removeLastBytes(BigInt& n, uint32_t amount)
 	while (amount != 0 && n.byteCount - amount > 0)
 	{
 		n.byteCount -= 1;
+		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
+		n.bytes = newMem ? newMem : nullptr;
+	}
+}
+
+void removeExceedingByte(BigInt& n)
+{
+	uint32_t exceedingByteCount = n.byteCount - MAXBYTE * 2;
+
+	if (exceedingByteCount > 0)
+	{
+		n.byteCount -= exceedingByteCount;
 		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
 		n.bytes = newMem ? newMem : nullptr;
 	}
@@ -213,8 +226,8 @@ BigInt operator+(BigInt a, BigInt b)
 		res.bytes[res.byteCount - 1] += 1;
 	}
 
-	// Bỏ bớt byte thừa nếu rỗng
-	//removeLastBytesIfNull(res);
+	// TODO: bỏ bớt byte thừa vượt quá gấp đôi số byte cho phép
+	//removeExceedingByte(res);
 
 	//io.writeOutputs(a, b, res, " + ");
 
@@ -350,8 +363,8 @@ BigInt operator<<(BigInt n, int steps)
 	int bitDistance = steps % 8;
 	BigInt res = n;
 
-	// UNDONE: cần đảm bảo rằng việc cấp phát thêm byte là cần thiết
-	addMoreBytes(res, byteDistance + (bitDistance ? 1 : 0)); // Thêm byte mở rộng
+	// Thêm byte để có vị trí dịch bit
+	addMoreBytes(res, byteDistance + (bitDistance ? 1 : 0));
 
 	if (byteDistance)
 	{
@@ -623,17 +636,18 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 	}
 
 	int32_t paddingByteCount = maxByteCount - q.byteCount;
-	int32_t excessByteCount = maxByteCount - r.byteCount;
+	int32_t excessByteCount = r.byteCount - maxByteCount;
 
+	// WARN: kiểm soát việc cấp phát thêm byte
 	//* Thêm byte đệm nếu thương số có ít hơn maxByteCount byte
 	if (paddingByteCount > 0)
 	{
-		addMoreBytes(q, paddingByteCount);
+		//addMoreBytes(q, paddingByteCount);
 	}
 	//* Xóa byte thừa nếu số dư có nhiều hơn maxByteCount byte
-	else if (excessByteCount < 0)
+	else if (excessByteCount > 0)
 	{
-		removeLastBytes(r, -excessByteCount);
+		removeLastBytes(r, excessByteCount);
 	}
 }
 

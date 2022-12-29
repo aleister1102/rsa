@@ -21,8 +21,9 @@ public:
 	}
 
 public:
-	BigInt next(uint32_t bitCount);
+	BigInt next(uint32_t byteCount = 1);
 	BigInt next(BigInt n);
+	BigInt next(BigInt a, BigInt b);
 };
 
 static BigIntRandom* random = BigIntRandom::getInstance();

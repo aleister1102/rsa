@@ -53,14 +53,12 @@ void ioTest(BigInt a) {
 	io.writeOutput("Dec: " + decStr);
 }
 
-void randomTest(int bitCount) {
-	BigInt numA = random->next(bitCount);
-	io.writeOutput(converter.bigIntToBinaryStr(numA));
+void randomTest() {
+	BigInt n = 11;
+	BigInt randNum = random->next(2, n - 2);
 
-	BigInt numB = random->next(numA);
-	io.writeOutput(converter.bigIntToBinaryStr(numB));
-
-	cout << (numA < numB) << endl;
+	bool isSmaller = randNum < n - 2;
+	io.writeOutput(isSmaller ? "yes" : "no");
 }
 
 void algoTest(BigInt a, BigInt b)
@@ -87,15 +85,20 @@ void test()
 		//operatorTest(a, b);
 		//ioTest(a);
 		//ioTest(b);
-		//randomTest(512);
-		algoTest(a, b);
+		//algoTest(a, b);
 	}
 }
 
 void testWithoutInputs()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
+		//randomTest();
+
+		//BigInt n = random->next(MAXBYTE);
+		BigInt test = converter.binaryStrToBigInt("00001011");
+		string isPrime = Algorithm::isPrime(test, 10) ? "yes" : "no";
+		io.writeOutput(isPrime);
 	}
 }
 
@@ -104,7 +107,8 @@ int main()
 	io.clearFile("output.txt");
 	io.clearFile("log.txt");
 
-	test();
+	//test();
+	testWithoutInputs();
 
 	return 0;
 }

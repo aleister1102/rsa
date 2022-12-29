@@ -1,40 +1,32 @@
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
-[Algorithm::powMod] Calculate powMod
-[Algorithm::powMod] Finish calculating powMod
+[Algorithm::isPrime] n = 00001011
+[Algorithm::isPrime] d = 00000101
+[Algorithm::isPrime] Random a for checking: 000000000000000000000100
+[Algorithm::isPrime] a^d mod n: 000000000000000000000000000000000000000000000001
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 000000000000000000001001
+[Algorithm::isPrime] a^d mod n: 0000000000000000000000000000000000000000000000000000000000000001
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 0000000000000011
+[Algorithm::isPrime] a^d mod n: 000000000000000000000000000000000000000000000001
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 0000000000001001
+[Algorithm::isPrime] a^d mod n: 0000000000000000000000000000000000000000000000000000000000000001
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 0000000000000011
+[Algorithm::isPrime] a^d mod n: 000000000000000000000000000000000000000000000001
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 000000000000000000000110
+[Algorithm::isPrime] a^d mod n: 0000000000000000000000000000000000000000000000000000000000001010
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 0000000000000101
+[Algorithm::isPrime] a^d mod n: 0000000000000000000000000000000000000000000000000000000000000001
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 000000000000000000000111
+[Algorithm::isPrime] a^d mod n: 000000000000000000000000000000000000000000001010
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 000000000000000000001001
+[Algorithm::isPrime] a^d mod n: 0000000000000000000000000000000000000000000000000000000000000001
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
+[Algorithm::isPrime] Random a for checking: 0000000000000101
+[Algorithm::isPrime] a^d mod n: 0000000000000000000000000000000000000000000000000000000000000001
+[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime
