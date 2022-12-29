@@ -4,6 +4,7 @@
 constexpr auto CHECK_PRIME_LOOPS = 10;
 
 using std::tuple;
+using std::string;
 
 class RSA
 {
@@ -18,11 +19,18 @@ public:
 	BigInt e = 0;
 	uint32_t byteCount;
 
-public:
-	RSA(uint32_t byteCount);
-
 private:
 	void generatePrimes();
+	void calculatePhiAndN();
 	void generateEncryptionKey();
 	void generateDecryptionKey();
+	string encrypt(string plainText);
+
+public:
+	RSA(uint32_t byteCount);
+	RSA(BigInt p, BigInt q);
+	RSA(BigInt d);
+
+public:
+	void encryptFile(string p, BigInt e, string c);
 };

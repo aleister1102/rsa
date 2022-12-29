@@ -131,7 +131,7 @@
     <ClCompile Include="Algorithm.cpp" />
     <ClCompile Include="BigInt.cpp" />
     <ClCompile Include="BigIntConverter.cpp" />
-    <ClCompile Include="BigIntIO.cpp" />
+    <ClCompile Include="IO.cpp" />
     <ClCompile Include="BigIntRandom.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RSA.cpp" />
@@ -140,14 +140,16 @@
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="BigInt.h" />
     <ClInclude Include="BigIntConverter.h" />
-    <ClInclude Include="BigIntIO.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="BigIntRandom.h" />
     <ClInclude Include="RSA.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="cipher.txt" />
     <Text Include="input.txt" />
     <Text Include="log.txt" />
     <Text Include="output.txt" />
+    <Text Include="plain.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

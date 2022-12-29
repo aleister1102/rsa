@@ -1,4 +1,4 @@
 ﻿#include "Algorithm.h"
-#include "BigIntIO.h"
+#include "IO.h"
 #include "BigIntConverter.h"
 #include "BigIntRandom.h"

@@ -3,11 +3,14 @@
 #include "BigIntConverter.h"
 #include <vector>
 #include <tuple>
+#include <fstream>
 
 using std::vector;
 using std::tuple;
+using std::fstream;
+using std::ios;
 
-class BigIntIO
+class IO
 {
 public:
 	void clearFile(string filename);
@@ -16,11 +19,15 @@ public:
 	void readBinaryInputs(vector<tuple<BigInt, BigInt>>& testCases);
 
 	void writeOutput(string output);
+	void writeOutput(fstream& fs, string output);
 	void writeOutputs(BigInt a, BigInt b, BigInt res, string op);
 	void writeOutputs(BigInt a, int b, BigInt res, string op);
 	void writeBinaryOutputs(BigInt a, BigInt b, BigInt res, string op);
 
 	void writeLog(string log);
+
+	bool openFile(fstream& fs, string filename, ios::openmode mode);
+	string readContent(fstream& fs);
 };
 
-static BigIntIO io;
+static IO io;

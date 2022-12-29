@@ -1,6 +1,6 @@
 ﻿#include "BigIntRandom.h"
 #include "BigIntConverter.h"
-#include "BigIntIO.h"
+#include "IO.h"
 
 using std::cout;
 using std::endl;

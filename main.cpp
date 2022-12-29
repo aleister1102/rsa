@@ -1,5 +1,5 @@
 ﻿#include "BigInt.h"
-#include "BigIntIO.h"
+#include "IO.h"
 #include "BigIntRandom.h"
 #include "Algorithm.h"
 #include "RSA.h"
@@ -14,8 +14,7 @@ vector<tuple<BigInt, BigInt>> testCases;
 
 steady_clock::time_point start;
 
-void startClock(steady_clock::time_point& start)
-{
+void startClock(steady_clock::time_point& start) {
 	start = high_resolution_clock::now();
 }
 
@@ -60,26 +59,23 @@ void algoTest(BigInt a, BigInt b)
 	//BigInt g = gcd(a, b);
 	//io.writeOutputs(a, b, g, " gcd ");
 
-	//BigInt m = converter.decimalStrToBigInt("450044376402256110986693418469");
-	//BigInt res = powMod(a, b, m);
-	//io.writeOutputs(a, b, res, " powMod ");
+	BigInt m = converter.binaryStrToBigInt("00101100011000111111001100010000101011010010110101100010010110001101010111011111111101111101010001111101010100110100010010011101010000000111101000101000110101000000110000100011110111001100100010100110000100011011111111010001011101101010011101110000011000011101100110000010100111110100011011101110010001001100010100111000101010110010011010011101100010000110100011101100010110000011001011010010010001100110011010000001101001000100100001000110100100110011100100111101010111110010001001101001010111111100110010000101");
+	BigInt res = powMod(a, b, m);
+	io.writeOutputs(a, b, res, " powMod ");
 
-	BigInt g, x, y;
-	std::tie(g, x, y) = extendedEuclidean(a, b);
-	io.writeOutputs(a, b, g, " extended gcd ");
+	//BigInt g, x, y;
+	//std::tie(g, x, y) = extendedEuclidean(a, b);
+	//io.writeOutputs(a, b, g, " extended gcd ");
 
-	BigInt res = inverseMod(a, b);
-	io.writeOutputs(a, b, res, " invMod ");
+	//BigInt res = inverseMod(a, b);
+	//io.writeOutputs(a, b, res, " invMod ");
 }
 
 void test()
 {
 	io.readBinaryInputs(testCases);
 
-	for (int i = 0; i < testCases.size(); i++)
-	{
-		//io.writeLog("Test case: " + std::to_string(i + 1));
-
+	for (int i = 0; i < testCases.size(); i++) {
 		BigInt a, b;
 		tie(a, b) = testCases[i];
 
@@ -92,16 +88,14 @@ void test()
 
 void testWithoutInputs()
 {
-	for (int i = 0; i < 1; i++)
-	{
-		//randomTest();
-	}
-
 	//BigInt test = converter.binaryStrToBigInt("10011011111000110011000001100000111110110011011100100011110100001011000101011100110011100001101001011100001101010000101110111011001101100100000110010001101100110110101110010110100001001001101110011111100000011111011101011010110111111100110101101001000011101100111110101010100110111000000100001010001100011011101111000111001100011111001010010111001101100000000001110001110100110011011000011000001110100011100010110101100010110000011001110110011000000001010101110111110101110110011010011010111010011111001011100001"); // 512 bit
 	//string isPrime = test.isPrime(10) ? "yes" : "no";
 	//io.writeOutput(isPrime);
 
-	RSA rsa(MAXBYTE);
+	BigInt p = converter.binaryStrToBigInt("0000000001001000101110000010000011001001010011100000100001110001");
+	BigInt q = converter.binaryStrToBigInt("000000000000001010000010000010101011110010111100101101001000011000110011");
+	RSA rsa(p, q);
+	rsa.encryptFile("plain.txt", rsa.e, "cipher.txt");
 }
 
 int main()

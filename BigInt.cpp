@@ -1,5 +1,5 @@
+#include "IO.h"
 #include "BigInt.h";
-#include "BigIntIO.h"
 #include "BigIntRandom.h"
 #include "BigIntConverter.h"
 
@@ -121,7 +121,7 @@ void addMoreBytes(BigInt& n, int amount)
 	}
 }
 
-// WARN: các hàm xóa byte sẽ realloc rất nhiều, có thể gây ảnh hưởng đến performance
+// Warn: các hàm xóa byte sẽ realloc rất nhiều, có thể gây ảnh hưởng đến performance
 void removeLastByteIfNull(BigInt& n)
 {
 	byte lastByte = getLastByte(n);
@@ -157,7 +157,7 @@ void removeLastBytes(BigInt& n, int amount)
 
 void removeExceedingByte(BigInt& n)
 {
-	int exceedingByteCount = n.byteCount - MAXBYTE * 2;
+	int exceedingByteCount = n.byteCount - MAXBYTE * 4; // ? Công thức bí ẩn
 
 	if (exceedingByteCount > 0)
 	{
@@ -209,7 +209,6 @@ BigInt twoComplement(BigInt n)
 	return res;
 }
 
-// TODO: cần kiểm soát việc cấp phát và giải phóng byte của toán tử +
 BigInt operator+(BigInt a, BigInt b)
 {
 	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
@@ -237,11 +236,8 @@ BigInt operator+(BigInt a, BigInt b)
 		res.bytes[res.byteCount - 1] += 1;
 	}
 
-	// Bỏ bớt byte thừa khi kết quả có số byte vượt quá 2 * MAXBYTE byte
+	// Todo: cần xác định đúng số byte thừa cần xóa
 	removeExceedingByte(res);
-	//removeLastByteIfNull(res);
-
-	//io.writeLog("[operator+] Current byte count of result: " + std::to_string(res.byteCount));
 
 	//io.writeOutputs(a, b, res, " + ");
 
@@ -649,7 +645,7 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 			r = twoComplement(a);
 	}
 
-	removeExceedingByte(r);
+	//removeExceedingByte(r);
 }
 
 BigInt operator/(BigInt a, BigInt b)
@@ -684,7 +680,7 @@ BigInt gcd(BigInt a, BigInt b)
 		return r;
 	}
 
-	while ((a % b) > 0) {
+	while ((a % b).isPositive()) {
 		r = a % b;
 		a = b;
 		b = r;
@@ -710,17 +706,16 @@ BigInt powMod(BigInt n, BigInt e, BigInt m)
 	return res;
 }
 
-// BUG: thuật toán có vẻ chưa hoạt động đúng
 bool millerRabinTest(BigInt n, BigInt d)
 {
 	// Sinh số a ngẫu nhiên a trong nửa đoạn [2, n - 1)
 	BigInt a = random.next(2, n - 1);
 
-	io.writeLog("[isPrime] random a for checking: " + converter.bigIntToBinaryStr(a));
+	//io.writeLog("[isPrime] random a for checking: " + converter.bigIntToBinaryStr(a));
 
 	// Nếu a và n không nguyên tố cùng nhau thì là hợp số
 	if (gcd(a, n) != 1) {
-		io.writeLog("[isPrime] a and n is not relative prime, so n is composite!");
+		//io.writeLog("[isPrime] a and n is not relative prime, so n is composite!");
 		return false;
 	}
 
@@ -730,7 +725,7 @@ bool millerRabinTest(BigInt n, BigInt d)
 
 	// Nếu x = 1 hoặc x == n - 1 thì x không phải là cơ sở miller-rabin (miller-rabin witness) của n => không phải là hợp số
 	if (x == 1 || x == n - 1) {
-		io.writeLog("[isPrime] a^d mod n is 1 or n - 1, so n is probably prime");
+		//io.writeLog("[isPrime] a^d mod n is 1 or n - 1, so n is probably prime");
 		return true;
 	}
 
@@ -745,12 +740,12 @@ bool millerRabinTest(BigInt n, BigInt d)
 
 		if (x == n - 1)
 		{
-			io.writeLog("[isPrime] x == n - 1, so n is propably prime!");
+			//io.writeLog("[isPrime] x == n - 1, so n is propably prime!");
 			return true;
 		}
 	}
 
-	io.writeLog("[isPrime] a is a witness of n, so n is composite!");
+	//io.writeLog("[isPrime] a is a witness of n, so n is composite!");
 	return false;
 }
 
@@ -762,11 +757,17 @@ bool BigInt::isPrime(int k)
 	//! Không lấy abs vì có thể bị sai (tràn số)
 	if (n.byteCount == MAXBYTE) addMoreBytes(n, 1);
 
-	io.writeLog("[isPrime] n = " + converter.bigIntToBinaryStr(n));
+	//io.writeLog("[isPrime] n = " + converter.bigIntToBinaryStr(n));
 
 	// Các trường hợp đơn giản
 	if (n <= 1 || n == 4)  return false;
 	if (n <= 3) return true;
+
+	// Trường hợp n là số chẵn
+	if (n.isEven()) {
+		//io.writeLog("[isPrime] n is an even number, so n is composite!");
+		return false;
+	}
 
 	// Viết n - 1 dưới dạng 2^s*d bằng cách phân tích thành các nhân tử lũy thừa 2
 	BigInt d = n - 1;
@@ -775,11 +776,11 @@ bool BigInt::isPrime(int k)
 		d >>= 1;
 	}
 
-	io.writeLog("[isPrime] d = " + converter.bigIntToBinaryStr(d));
+	//io.writeLog("[isPrime] d = " + converter.bigIntToBinaryStr(d));
 
 	for (int i = 1; i <= k; i++)
 	{
-		io.writeLog("[isPrime] Test: " + std::to_string(i));
+		//io.writeLog("[isPrime] Test: " + std::to_string(i));
 
 		if (millerRabinTest(n, d) == false)
 			return false;
@@ -801,7 +802,7 @@ tuple<BigInt, BigInt, BigInt> extendedEuclidean(BigInt a, BigInt b)
 	return std::make_tuple(gcd, (y - (b / a) * x), x);
 }
 
-// TODO: hiểu cách hoạt động của thuật toán
+// Todo: hiểu cách hoạt động của thuật toán
 BigInt inverseMod(BigInt a, BigInt m) {
 	BigInt m0 = m, t, q;
 	BigInt x0 = 0, x1 = 1;

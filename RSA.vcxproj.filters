@@ -24,7 +24,7 @@
     <ClCompile Include="BigIntConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BigIntIO.cpp">
+    <ClCompile Include="IO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Algorithm.cpp">
@@ -44,7 +44,7 @@
     <ClInclude Include="BigIntConverter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BigIntIO.h">
+    <ClInclude Include="IO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Algorithm.h">
@@ -65,6 +65,12 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="log.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="cipher.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="plain.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

@@ -5,7 +5,7 @@
 
 typedef unsigned char byte;
 
-constexpr uint32_t MAXBYTE = 128 / 8;
+constexpr uint32_t MAXBYTE = 64 / 8;
 
 static byte zero;
 
@@ -35,7 +35,7 @@ public:
 		memset(bytes, 0, byteCount * sizeof(byte));
 	}
 
-	// TODO: giảm số lần gọi constructor nhiều nhất có thể
+	// Refactor: giảm số lần gọi constructor nhiều nhất có thể
 	BigInt(const BigInt& other) : bytes(nullptr), byteCount(0)
 	{
 		*this = other;

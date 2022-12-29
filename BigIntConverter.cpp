@@ -1,5 +1,5 @@
 #include "BigIntConverter.h"
-#include "BigIntIO.h"
+#include "IO.h"
 
 using std::cout;
 using std::endl;
@@ -75,7 +75,7 @@ string BigIntConverter::byteToString(byte n, bool isReversed)
 	return res;
 }
 
-// TODO: cần có những hàm kiểm tra tính hợp lệ của chuỗi đầu vào
+// Todo: cần có những hàm kiểm tra tính hợp lệ của chuỗi đầu vào
 BigInt BigIntConverter::binaryStrToBigInt(string binStr)
 {
 	int length = binStr.length();
@@ -134,7 +134,7 @@ string BigIntConverter::bigIntToBinaryStr(BigInt n)
 	return res;
 }
 
-// BUG: không cho ra kết quả đúng
+// Bug: không cho ra kết quả đúng
 string BigIntConverter::bigIntToDecimalStr(BigInt n)
 {
 	//cout << "Converting to decimal string..." << endl;
@@ -169,8 +169,8 @@ string BigIntConverter::bigIntToDecimalStr(BigInt n)
 	return res;
 }
 
-// BUG: số âm đang được đọc thành số dương
-// WARN: tốc độ chuyển là rất chậm
+// Bug: số âm đang được đọc thành số dương
+// Warn: tốc độ chuyển là rất chậm
 BigInt BigIntConverter::decimalStrToBigInt(string decStr)
 {
 	BigInt res = 0;

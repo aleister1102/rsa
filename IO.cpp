@@ -1,18 +1,20 @@
-#include "BigIntIO.h"
+#include "IO.h"
 #include <fstream>
+#include <string>
 
 using std::endl;
 using std::ios;
 using std::fstream;
 using std::make_tuple;
+using std::cin;
 
-void BigIntIO::clearFile(string filename)
+void IO::clearFile(string filename)
 {
 	fstream f(filename, ios::out);
 	f.close();
 }
 
-void BigIntIO::readInputs(vector<tuple<BigInt, BigInt>>& testCases)
+void IO::readInputs(vector<tuple<BigInt, BigInt>>& testCases)
 {
 	fstream f("input.txt", ios::in);
 	string numberA, numberB;
@@ -37,7 +39,7 @@ void BigIntIO::readInputs(vector<tuple<BigInt, BigInt>>& testCases)
 	f.close();
 }
 
-void BigIntIO::readBinaryInputs(vector<tuple<BigInt, BigInt>>& testCases)
+void IO::readBinaryInputs(vector<tuple<BigInt, BigInt>>& testCases)
 {
 	fstream f("input.txt", ios::in);
 	string numberA, numberB;
@@ -62,7 +64,7 @@ void BigIntIO::readBinaryInputs(vector<tuple<BigInt, BigInt>>& testCases)
 	f.close();
 }
 
-void BigIntIO::writeOutput(string output)
+void IO::writeOutput(string output)
 {
 	fstream f("output.txt", ios::app);
 
@@ -71,7 +73,12 @@ void BigIntIO::writeOutput(string output)
 	f.close();
 }
 
-void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt res, string op)
+void IO::writeOutput(fstream& fs, string output)
+{
+	fs << output;
+}
+
+void IO::writeOutputs(BigInt a, BigInt b, BigInt res, string op)
 {
 	fstream f("output.txt", ios::app);
 
@@ -85,7 +92,7 @@ void BigIntIO::writeOutputs(BigInt a, BigInt b, BigInt res, string op)
 	f.close();
 }
 
-void BigIntIO::writeOutputs(BigInt a, int b, BigInt res, string op)
+void IO::writeOutputs(BigInt a, int b, BigInt res, string op)
 {
 	fstream f("output.txt", ios::app);
 
@@ -98,7 +105,7 @@ void BigIntIO::writeOutputs(BigInt a, int b, BigInt res, string op)
 	f.close();
 }
 
-void BigIntIO::writeBinaryOutputs(BigInt a, BigInt b, BigInt res, string op)
+void IO::writeBinaryOutputs(BigInt a, BigInt b, BigInt res, string op)
 {
 	fstream f("output.txt", ios::app);
 
@@ -112,11 +119,40 @@ void BigIntIO::writeBinaryOutputs(BigInt a, BigInt b, BigInt res, string op)
 	f.close();
 }
 
-void BigIntIO::writeLog(string log)
+void IO::writeLog(string log)
 {
 	fstream f("log.txt", ios::app);
 
 	f << log << endl;
 
 	f.close();
+}
+
+bool IO::openFile(fstream& fs, string filename, ios::openmode mode)
+{
+	fs.open(filename, mode);
+
+	if (!fs.is_open())
+	{
+		io.writeOutput("[IO::openFileForRead] file: " + filename + " is not existed");
+		return false;
+	}
+	else {
+		io.writeOutput("[IO::openFileForRead] file: " + filename + " existed");
+		return true;
+	}
+}
+
+string IO::readContent(fstream& fs)
+{
+	string content;
+
+	while (!fs.eof())
+	{
+		string buffer;
+		getline(fs, buffer, '\n');
+		content += buffer;
+	}
+
+	return content;
 }
