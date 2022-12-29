@@ -110,7 +110,41 @@ string RSA::encrypt(string plainText) {
 	return cipherText;
 }
 
-void RSA::encryptFile(string plainTextFile, BigInt encryptionKey, string cipherTextFile)
+string RSA::decrypt(string cipherText)
+{
+	string plainText = "";
+	string binStr = "";
+
+	for (char character : cipherText)
+	{
+		// Nếu như không phải khoảng trắng thì cho vào chuỗi các số
+		if (character != ' ')
+			binStr += character;
+		// Nếu gặp khoảng trắng thì tiến hành chuyển chuỗi các số về dạng ascii
+		else
+		{
+			io.writeLog("[RSA::decrypt] decrypt " + binStr);
+
+			BigInt c = converter.binaryStrToBigInt(binStr);
+
+			BigInt m = powMod(c, d, n);
+
+			io.writeLog("[RSA::encrypt] ascii value: " + converter.bigIntToBinaryStr(m));
+
+			int ascii = m.getIntValue();
+
+			io.writeLog("[RSA::encrypt] ascii value as character: " + char(ascii));
+
+			plainText += char(ascii);
+
+			binStr = ""; // Reset chuỗi nhị phân
+		}
+	}
+
+	return plainText;
+}
+
+void RSA::encryptFile(string plainTextFile, string cipherTextFile)
 {
 	io.writeOutput("[RSA::encryptFile] encrypting " + plainTextFile);
 
@@ -123,6 +157,22 @@ void RSA::encryptFile(string plainTextFile, BigInt encryptionKey, string cipherT
 	io.writeOutput(cfs, cipherText);
 
 	io.writeOutput("[RSA::encryptFile] cipher text " + cipherText);
+
+	pfs.close();
+	cfs.close();
+}
+
+void RSA::decryptFile(string cipherTextFile, string plainTextFile)
+{
+	io.writeOutput("[RSA::decryptFile] decrypting " + cipherTextFile);
+
+	fstream cfs, pfs;
+	if (io.openFile(cfs, cipherTextFile, ios::in) == false) return;
+	if (io.openFile(pfs, plainTextFile, ios::out) == false) return;
+
+	string cipherText = io.readContent(cfs);
+	string plainText = decrypt(cipherText);
+	io.writeOutput(pfs, plainText);
 
 	pfs.close();
 	cfs.close();

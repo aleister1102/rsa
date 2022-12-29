@@ -170,7 +170,7 @@ string BigIntConverter::bigIntToDecimalStr(BigInt n)
 }
 
 // Bug: số âm đang được đọc thành số dương
-// Warn: tốc độ chuyển là rất chậm
+// Warn: tốc độ chuyển đổi là rất chậm
 BigInt BigIntConverter::decimalStrToBigInt(string decStr)
 {
 	BigInt res = 0;

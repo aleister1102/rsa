@@ -25,6 +25,7 @@ private:
 	void generateEncryptionKey();
 	void generateDecryptionKey();
 	string encrypt(string plainText);
+	string decrypt(string cipherText);
 
 public:
 	RSA(uint32_t byteCount);
@@ -32,5 +33,6 @@ public:
 	RSA(BigInt d);
 
 public:
-	void encryptFile(string p, BigInt e, string c);
+	void encryptFile(string p, string c);
+	void decryptFile(string c, string p);
 };

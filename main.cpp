@@ -95,7 +95,8 @@ void testWithoutInputs()
 	BigInt p = converter.binaryStrToBigInt("0000000001001000101110000010000011001001010011100000100001110001");
 	BigInt q = converter.binaryStrToBigInt("000000000000001010000010000010101011110010111100101101001000011000110011");
 	RSA rsa(p, q);
-	rsa.encryptFile("plain.txt", rsa.e, "cipher.txt");
+	rsa.encryptFile("plain.txt", "cipher.txt");
+	rsa.decryptFile("cipher.txt", "decrypted_plain.txt");
 }
 
 int main()

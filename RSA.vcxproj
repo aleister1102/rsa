@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="cipher.txt" />
+    <Text Include="decrypted_plain.txt" />
     <Text Include="input.txt" />
     <Text Include="log.txt" />
     <Text Include="output.txt" />
