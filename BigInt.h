@@ -5,7 +5,7 @@
 
 typedef unsigned char byte;
 
-constexpr uint32_t MAXBYTE = 512 / 8;
+constexpr uint32_t MAXBYTE = 128 / 8;
 
 static byte zero;
 

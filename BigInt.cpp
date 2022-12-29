@@ -648,6 +648,8 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 		if (isDivided)
 			r = twoComplement(a);
 	}
+
+	removeExceedingByte(r);
 }
 
 BigInt operator/(BigInt a, BigInt b)
@@ -714,25 +716,21 @@ bool millerRabinTest(BigInt n, BigInt d)
 	// Sinh số a ngẫu nhiên a trong nửa đoạn [2, n - 1)
 	BigInt a = random.next(2, n - 1);
 
-	io.writeLog("[Algorithm::isPrime] Random a for checking: " + converter.bigIntToBinaryStr(a));
-
-	// Trường hợp nếu a và n không nguyên tố cùng nhau
-	//if ((gcd(a, n) != 1))
-	//	return false;
-
-	// Tính x = a^d mod n
-	BigInt x = powMod(a, d, n);
-	io.writeLog("[Algorithm::isPrime] a^d mod n: " + converter.bigIntToBinaryStr(x));
+	io.writeLog("[isPrime] random a for checking: " + converter.bigIntToBinaryStr(a));
 
 	// Nếu a và n không nguyên tố cùng nhau thì là hợp số
 	if (gcd(a, n) != 1) {
-		io.writeLog("[Algorithm::isPrime] a and n is not relative prime, so n is composite!");
+		io.writeLog("[isPrime] a and n is not relative prime, so n is composite!");
 		return false;
 	}
 
+	// Tính x = a^d mod n
+	BigInt x = powMod(a, d, n);
+	//io.writeLog("[isPrime] a^d mod n: " + converter.bigIntToBinaryStr(x));
+
 	// Nếu x = 1 hoặc x == n - 1 thì x không phải là cơ sở miller-rabin (miller-rabin witness) của n => không phải là hợp số
 	if (x == 1 || x == n - 1) {
-		io.writeLog("[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime");
+		io.writeLog("[isPrime] a^d mod n is 1 or n - 1, so n is probably prime");
 		return true;
 	}
 
@@ -740,19 +738,19 @@ bool millerRabinTest(BigInt n, BigInt d)
 	while (d != n - 1)
 	{
 		x = (x * x) % n;
-		io.writeLog("[Algorithm::isPrime] x^2 mod n: " + converter.bigIntToBinaryStr(x));
+		//io.writeLog("[isPrime] x^2 mod n: " + converter.bigIntToBinaryStr(x));
 
 		d <<= 1;
-		io.writeLog("[Algorithm::isPrime] d: " + converter.bigIntToBinaryStr(d));
+		//io.writeLog("[isPrime] d: " + converter.bigIntToBinaryStr(d));
 
 		if (x == n - 1)
 		{
-			io.writeLog("[Algorithm::isPrime] x == n - 1, so it propably prime!");
+			io.writeLog("[isPrime] x == n - 1, so n is propably prime!");
 			return true;
 		}
 	}
 
-	io.writeLog("[Algorithm::isPrime] find a witness of x, so it is composite!");
+	io.writeLog("[isPrime] a is a witness of n, so n is composite!");
 	return false;
 }
 
@@ -764,7 +762,7 @@ bool BigInt::isPrime(int k)
 	//! Không lấy abs vì có thể bị sai (tràn số)
 	if (n.byteCount == MAXBYTE) addMoreBytes(n, 1);
 
-	io.writeLog("[Algorithm::isPrime] n = " + converter.bigIntToBinaryStr(n));
+	io.writeLog("[isPrime] n = " + converter.bigIntToBinaryStr(n));
 
 	// Các trường hợp đơn giản
 	if (n <= 1 || n == 4)  return false;
@@ -777,11 +775,11 @@ bool BigInt::isPrime(int k)
 		d >>= 1;
 	}
 
-	io.writeLog("[Algorithm::isPrime] d = " + converter.bigIntToBinaryStr(d));
+	io.writeLog("[isPrime] d = " + converter.bigIntToBinaryStr(d));
 
 	for (int i = 1; i <= k; i++)
 	{
-		io.writeLog("[Algorithm::isPrime] Test: " + std::to_string(i));
+		io.writeLog("[isPrime] Test: " + std::to_string(i));
 
 		if (millerRabinTest(n, d) == false)
 			return false;
@@ -803,24 +801,19 @@ tuple<BigInt, BigInt, BigInt> extendedEuclidean(BigInt a, BigInt b)
 	return std::make_tuple(gcd, (y - (b / a) * x), x);
 }
 
-// TODO: test inverse mod function
+// TODO: hiểu cách hoạt động của thuật toán
 BigInt inverseMod(BigInt a, BigInt m) {
-	BigInt g, x, y;
-	std::tie(g, x, y) = extendedEuclidean(a, m);
+	BigInt m0 = m, t, q;
+	BigInt x0 = 0, x1 = 1;
 
-	// Cắt bớt byte thừa
-	int exceedingByteCount = x.byteCount - m.byteCount;
-	removeLastBytes(x, exceedingByteCount);
+	if (m == 1) return 1;
 
-	if (g != 1)
-	{
-		io.writeLog("[inverseMod] a and m is not relative prime, so can not find the inverse mod!");
-		return BigInt(0);
+	while (a > 1) {
+		q = a / m;
+		t = m, m = a % m, a = t;
+		t = x0, x0 = x1 - q * x0, x1 = t;
 	}
-	else
-	{
-		if (x.isNegative())
-			return m - abs(x);
-		return x;
-	}
+
+	if (x1 < 0) x1 += m0;
+	return x1;
 }
