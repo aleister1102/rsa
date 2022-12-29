@@ -73,21 +73,30 @@ bool Algorithm::millerRabinTest(BigInt n, BigInt d)
 	// Kiểm tra các điều kiện của một số miller-rabin witness
 	while (d != n - 1)
 	{
-		x = powMod(x, 2, n);
+		x = (x * x) % n;
 		io.writeLog("[Algorithm::isPrime] x^2 mod n: " + converter.bigIntToBinaryStr(x));
 
-		d << 1;
+		d <<= 1;
 		io.writeLog("[Algorithm::isPrime] d: " + converter.bigIntToBinaryStr(d));
 
-		if (x == n - 1)    return true;
+		if (x == n - 1)
+		{
+			io.writeLog("[Algorithm::isPrime] x == n - 1, so it propably prime!");
+			return true;
+		}
+		if (x == 1) return false;
 	}
 
+	io.writeLog("[Algorithm::isPrime] find a witness of x, so it is composite!");
 	return false;
 }
 
 bool Algorithm::isPrime(BigInt n, int k)
 {
-	n = abs(n);
+	//! Nếu như kích thước byte là MAXBYTE thì cấp phát thêm một byte để đảm bảo n là số dương
+	//! Không lấy abs vì có thể bị sai (tràn số)
+	if (n.byteCount == MAXBYTE) addMoreBytes(n, 1);
+
 	io.writeLog("[Algorithm::isPrime] n = " + converter.bigIntToBinaryStr(n));
 
 	// Các trường hợp đơn giản
@@ -105,6 +114,8 @@ bool Algorithm::isPrime(BigInt n, int k)
 
 	for (int i = 1; i <= k; i++)
 	{
+		io.writeLog("[Algorithm::isPrime] Test: " + std::to_string(i + 1));
+
 		if (millerRabinTest(n, d) == false)
 			return false;
 	}

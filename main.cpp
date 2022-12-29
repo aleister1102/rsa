@@ -47,10 +47,6 @@ void operatorTest(BigInt a, BigInt b) {
 
 void ioTest(BigInt a) {
 	io.writeOutput("Bin: " + converter.bigIntToBinaryStr(a));
-
-	string decStr = converter.bigIntToDecimalStr(a);
-
-	io.writeOutput("Dec: " + decStr);
 }
 
 void randomTest() {
@@ -75,7 +71,7 @@ void algoTest(BigInt a, BigInt b)
 
 void test()
 {
-	io.readInputs(testCases);
+	io.readBinaryInputs(testCases);
 
 	for (int i = 0; i < testCases.size(); i++)
 	{
@@ -96,8 +92,14 @@ void testWithoutInputs()
 		//randomTest();
 
 		//BigInt n = random->next(MAXBYTE);
-		BigInt test = converter.binaryStrToBigInt("00001011");
+		BigInt test = converter.binaryStrToBigInt("00010101101100011000011100000101101101001110111111100010111100011001000010001101110101100010111100010000110001111001010111110010010101011000011010111100100110111001010000010011001110111100001100001100110010100001011111100110100110100111000110110011011100111110011001010110000011100001000001010101100111000111101010101010011001010010011010010000111101010010100010101010010101100110011000010111011101110000011000101110011011010010101010101011000001000110111010001000011010111010111111100110011001011001011110010001");
+
+		startClock(start);
+
 		string isPrime = Algorithm::isPrime(test, 10) ? "yes" : "no";
+
+		stopClock(start);
+
 		io.writeOutput(isPrime);
 	}
 }

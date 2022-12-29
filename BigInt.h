@@ -3,9 +3,9 @@
 #include <iostream>
 #include <string>
 
-constexpr uint32_t MAXBYTE = 32;
-
 typedef unsigned char byte;
+
+constexpr uint32_t MAXBYTE = 64;
 
 static byte zero;
 
