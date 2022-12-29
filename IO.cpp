@@ -138,7 +138,6 @@ bool IO::openFile(fstream& fs, string filename, ios::openmode mode)
 		return false;
 	}
 	else {
-		io.writeOutput("[IO::openFileForRead] file: " + filename + " existed");
 		return true;
 	}
 }

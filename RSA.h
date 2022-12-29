@@ -19,20 +19,23 @@ public:
 	BigInt e = 0;
 	uint32_t byteCount;
 
-private:
-	void generatePrimes();
-	void calculatePhiAndN();
-	void generateEncryptionKey();
-	void generateDecryptionKey();
-	string encrypt(string plainText);
-	string decrypt(string cipherText);
-
 public:
 	RSA(uint32_t byteCount);
 	RSA(BigInt p, BigInt q);
 	RSA(BigInt d);
 
+private:
+	void generatePrimes();
+	void calculatePhiAndN();
+	void generateEncryptionKey();
+	void generateDecryptionKey();
+
 public:
-	void encryptFile(string p, string c);
-	void decryptFile(string c, string p);
+	static string encrypt(string plainText, BigInt n, BigInt e);
+	static string decrypt(string cipherText, BigInt n, BigInt d);
+	static void encryptFile(string p, BigInt n, BigInt e, string c);
+	static void decryptFile(string c, BigInt n, BigInt d, string p);
+
+public:
+	static void test();
 };
