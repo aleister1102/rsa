@@ -134,6 +134,7 @@ string BigIntConverter::bigIntToBinaryStr(BigInt n)
 	return res;
 }
 
+// BUG: không cho ra kết quả đúng
 string BigIntConverter::bigIntToDecimalStr(BigInt n)
 {
 	//cout << "Converting to decimal string..." << endl;

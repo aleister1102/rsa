@@ -134,6 +134,7 @@
     <ClCompile Include="BigIntIO.cpp" />
     <ClCompile Include="BigIntRandom.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RSA.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
@@ -141,6 +142,7 @@
     <ClInclude Include="BigIntConverter.h" />
     <ClInclude Include="BigIntIO.h" />
     <ClInclude Include="BigIntRandom.h" />
+    <ClInclude Include="RSA.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />

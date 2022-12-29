@@ -1,6 +1,9 @@
 #include "BigInt.h";
-#include "BigIntConverter.h"
 #include "BigIntIO.h"
+#include "BigIntRandom.h"
+#include "BigIntConverter.h"
+
+using std::to_string;
 
 uint32_t getMaxByteCount(uint32_t a, uint32_t b)
 {
@@ -58,7 +61,7 @@ bool BigInt::isEven()
 bool BigInt::isZero()
 {
 	BigInt temp = *this;
-	removeLastBytesIfNull(temp);
+	removeTrailingBytesIfNull(temp);
 
 	bool res = false;
 	if (temp.byteCount == 1 && temp.bytes[0] == zero)
@@ -118,40 +121,48 @@ void addMoreBytes(BigInt& n, int amount)
 	}
 }
 
-// REFACTOR: kiểm tra số byte rỗng và realloc 1 lần duy nhất
-void removeLastBytesIfNull(BigInt& n, int preserve)
+// WARN: các hàm xóa byte sẽ realloc rất nhiều, có thể gây ảnh hưởng đến performance
+void removeLastByteIfNull(BigInt& n)
 {
 	byte lastByte = getLastByte(n);
 
-	while (lastByte == zero && n.byteCount > preserve) // preserve là số byte tối thiểu được phép giữ lại
-	{
+	if (lastByte == zero) {
 		n.byteCount -= 1;
-		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
-		n.bytes = newMem ? newMem : nullptr;
-
-		lastByte = getLastByte(n);
+		n.bytes = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
 	}
 }
 
-void removeLastBytes(BigInt& n, uint32_t amount)
+void removeTrailingBytesIfNull(BigInt& n)
 {
-	while (amount != 0 && n.byteCount - amount > 0)
+	uint32_t nullBytes = 0;
+
+	for (int i = n.byteCount - 1; i > 0; i--)
 	{
-		n.byteCount -= 1;
-		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
-		n.bytes = newMem ? newMem : nullptr;
+		if (n.bytes[i] != zero) break;
+		nullBytes++;
+	}
+
+	n.byteCount -= nullBytes;
+	n.bytes = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
+}
+
+void removeLastBytes(BigInt& n, int amount)
+{
+	if (amount > 0 && n.byteCount - amount > 0)
+	{
+		n.byteCount -= amount;
+		n.bytes = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
 	}
 }
 
 void removeExceedingByte(BigInt& n)
 {
-	int32_t exceedingByteCount = n.byteCount - MAXBYTE * 2;
+	int exceedingByteCount = n.byteCount - MAXBYTE * 2;
 
 	if (exceedingByteCount > 0)
 	{
 		n.byteCount -= exceedingByteCount;
-		auto newMem = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
-		n.bytes = newMem ? newMem : nullptr;
+		n.bytes = (byte*)realloc(n.bytes, n.byteCount * sizeof(byte));
 	}
 }
 
@@ -198,7 +209,7 @@ BigInt twoComplement(BigInt n)
 	return res;
 }
 
-// TODO: đảm bảo rằng không cần cắt bớt byte rỗng ở cuối
+// TODO: cần kiểm soát việc cấp phát và giải phóng byte của toán tử +
 BigInt operator+(BigInt a, BigInt b)
 {
 	uint32_t maxByteCount = getMaxByteCount(a.byteCount, b.byteCount);
@@ -215,7 +226,7 @@ BigInt operator+(BigInt a, BigInt b)
 		res.bytes[i] = a.bytes[i] + b.bytes[i] + (carry ? 1 : 0);
 
 		// Nếu tổng hai byte và nhớ một ở byte trước cũng lớn hơn 255
-		// thì nhớ 1 sang byte tiếp theo55
+		// thì nhớ 1 sang byte tiếp theo
 		carry = (a.bytes[i] + b.bytes[i] + (carry ? 1 : 0)) > 255;
 	}
 
@@ -226,8 +237,11 @@ BigInt operator+(BigInt a, BigInt b)
 		res.bytes[res.byteCount - 1] += 1;
 	}
 
-	// TODO: bỏ bớt byte thừa khi kết quả có số byte vượt quá 2 * MAXBYTE byte
+	// Bỏ bớt byte thừa khi kết quả có số byte vượt quá 2 * MAXBYTE byte
 	removeExceedingByte(res);
+	//removeLastByteIfNull(res);
+
+	//io.writeLog("[operator+] Current byte count of result: " + std::to_string(res.byteCount));
 
 	//io.writeOutputs(a, b, res, " + ");
 
@@ -556,7 +570,7 @@ BigInt operator~(BigInt n) {
 }
 
 uint32_t getBitLength(BigInt n) {
-	removeLastBytesIfNull(n);
+	removeTrailingBytesIfNull(n);
 	uint32_t count = (n.byteCount * 8);
 
 	// Trừ bớt các bit 0 ở byte cuối
@@ -654,4 +668,159 @@ BigInt operator%(BigInt a, BigInt b)
 
 	//io.writeOutputs(a, b, r, " % ");
 	return r;
+}
+
+BigInt gcd(BigInt a, BigInt b)
+{
+	BigInt r = 0;
+	a = abs(a);
+	b = abs(b);
+
+	if (a == 0 && b == 0 || b == 0)
+	{
+		io.writeLog("gcd(0, 0) of gcd(a, 0) is undefined");
+		return r;
+	}
+
+	while ((a % b) > 0) {
+		r = a % b;
+		a = b;
+		b = r;
+	}
+
+	return b;
+}
+
+BigInt powMod(BigInt n, BigInt e, BigInt m)
+{
+	BigInt res = 1;
+	n = abs(n);
+	e = abs(e);
+
+	while (e.isPositive()) {
+		if (e.isOdd())
+			res = (res * n) % m;
+
+		n = (n * n) % m;
+		e >>= 1;
+	}
+
+	return res;
+}
+
+// BUG: thuật toán có vẻ chưa hoạt động đúng
+bool millerRabinTest(BigInt n, BigInt d)
+{
+	// Sinh số a ngẫu nhiên a trong nửa đoạn [2, n - 1)
+	BigInt a = random.next(2, n - 1);
+
+	io.writeLog("[Algorithm::isPrime] Random a for checking: " + converter.bigIntToBinaryStr(a));
+
+	// Trường hợp nếu a và n không nguyên tố cùng nhau
+	//if ((gcd(a, n) != 1))
+	//	return false;
+
+	// Tính x = a^d mod n
+	BigInt x = powMod(a, d, n);
+	io.writeLog("[Algorithm::isPrime] a^d mod n: " + converter.bigIntToBinaryStr(x));
+
+	// Nếu a và n không nguyên tố cùng nhau thì là hợp số
+	if (gcd(a, n) != 1) {
+		io.writeLog("[Algorithm::isPrime] a and n is not relative prime, so n is composite!");
+		return false;
+	}
+
+	// Nếu x = 1 hoặc x == n - 1 thì x không phải là cơ sở miller-rabin (miller-rabin witness) của n => không phải là hợp số
+	if (x == 1 || x == n - 1) {
+		io.writeLog("[Algorithm::isPrime] a^d mod n is 1 or n - 1, so it is probably prime");
+		return true;
+	}
+
+	// Kiểm tra các điều kiện của một số miller-rabin witness
+	while (d != n - 1)
+	{
+		x = (x * x) % n;
+		io.writeLog("[Algorithm::isPrime] x^2 mod n: " + converter.bigIntToBinaryStr(x));
+
+		d <<= 1;
+		io.writeLog("[Algorithm::isPrime] d: " + converter.bigIntToBinaryStr(d));
+
+		if (x == n - 1)
+		{
+			io.writeLog("[Algorithm::isPrime] x == n - 1, so it propably prime!");
+			return true;
+		}
+	}
+
+	io.writeLog("[Algorithm::isPrime] find a witness of x, so it is composite!");
+	return false;
+}
+
+bool BigInt::isPrime(int k)
+{
+	BigInt n = *this;
+
+	//! Nếu như kích thước byte là MAXBYTE thì cấp phát thêm một byte để đảm bảo n là số dương
+	//! Không lấy abs vì có thể bị sai (tràn số)
+	if (n.byteCount == MAXBYTE) addMoreBytes(n, 1);
+
+	io.writeLog("[Algorithm::isPrime] n = " + converter.bigIntToBinaryStr(n));
+
+	// Các trường hợp đơn giản
+	if (n <= 1 || n == 4)  return false;
+	if (n <= 3) return true;
+
+	// Viết n - 1 dưới dạng 2^s*d bằng cách phân tích thành các nhân tử lũy thừa 2
+	BigInt d = n - 1;
+	while (d.isEven())
+	{
+		d >>= 1;
+	}
+
+	io.writeLog("[Algorithm::isPrime] d = " + converter.bigIntToBinaryStr(d));
+
+	for (int i = 1; i <= k; i++)
+	{
+		io.writeLog("[Algorithm::isPrime] Test: " + std::to_string(i));
+
+		if (millerRabinTest(n, d) == false)
+			return false;
+	}
+
+	return true;
+}
+
+tuple<BigInt, BigInt, BigInt> extendedEuclidean(BigInt a, BigInt b)
+{
+	if (a == 0) {
+		return std::make_tuple(b, 0, 1);
+	}
+
+	BigInt gcd, x, y;
+
+	std::tie(gcd, x, y) = extendedEuclidean(b % a, a);
+
+	return std::make_tuple(gcd, (y - (b / a) * x), x);
+}
+
+// TODO: test inverse mod function
+BigInt inverseMod(BigInt a, BigInt m) {
+	BigInt g, x, y;
+	std::tie(g, x, y) = extendedEuclidean(a, m);
+
+	// Cắt bớt byte thừa
+	int exceedingByteCount = x.byteCount - m.byteCount;
+	removeLastBytes(x, exceedingByteCount);
+
+	if (g != 1)
+	{
+		io.writeLog("[inverseMod] a and m is not relative prime, so can not find the inverse mod!");
+		return BigInt(0);
+	}
+	else
+	{
+		if (x.isNegative())
+			return m - abs(x);
+		return x;
+	}
 }

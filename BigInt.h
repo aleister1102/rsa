@@ -5,7 +5,7 @@
 
 typedef unsigned char byte;
 
-constexpr uint32_t MAXBYTE = 128;
+constexpr uint32_t MAXBYTE = 512 / 8;
 
 static byte zero;
 
@@ -85,11 +85,14 @@ public:
 	bool isOdd();
 	bool isEven();
 	bool isZero();
+	bool isPrime(int k);
 };
 
 byte getLastByte(const BigInt& n);
 
-void removeLastBytesIfNull(BigInt& n, int preserve = 1);
+void removeLastByteIfNull(BigInt& n);
+
+void removeTrailingBytesIfNull(BigInt& n);
 
 uint32_t getBitLength(BigInt n);
 
@@ -100,6 +103,16 @@ BigInt abs(BigInt n);
 void division(BigInt a, BigInt b, BigInt& q, BigInt& r);
 
 BigInt twoComplement(BigInt n);
+
+BigInt gcd(BigInt a, BigInt b);
+
+std::tuple<BigInt, BigInt, BigInt> extendedEuclidean(BigInt a, BigInt b);
+
+BigInt inverseMod(BigInt a, BigInt m);
+
+BigInt powMod(BigInt n, BigInt e, BigInt m);
+
+bool millerRabinTest(BigInt n, BigInt d);
 
 BigInt operator + (BigInt a, BigInt b);
 BigInt operator + (BigInt a, int value);

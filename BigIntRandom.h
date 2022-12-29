@@ -26,4 +26,4 @@ public:
 	BigInt next(BigInt a, BigInt b);
 };
 
-static BigIntRandom* random = BigIntRandom::getInstance();
+static BigIntRandom random = *BigIntRandom::getInstance();

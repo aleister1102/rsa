@@ -26,7 +26,7 @@ BigInt BigIntRandom::next(uint32_t byteCount)
 BigInt BigIntRandom::next(BigInt n)
 {
 	uint32_t maxBitCount = getBitLength(n);
-	uint32_t resByteCount = maxBitCount / 8 + (maxBitCount % 8 ? 1 : 0);
+	uint32_t resByteCount = maxBitCount / 8 - 1;
 	BigInt res = next(resByteCount);
 
 	// Chia lấy dư để res không vượt quá n
@@ -39,6 +39,7 @@ BigInt BigIntRandom::next(BigInt n)
 BigInt BigIntRandom::next(BigInt a, BigInt b)
 {
 	BigInt res = next(b - a);
+
 	res = res + a;
 
 	//io.writeLog("[BigIntRandom::next] random number in [a, b): " + converter.bigIntToBinaryStr(res));

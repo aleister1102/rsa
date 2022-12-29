@@ -1,1 +1,14 @@
-yes
+3 extended gcd 9 = 3
+3 invMod 9 = 0
+5 extended gcd 7 = 1
+5 invMod 7 = 3
+1 extended gcd 2 = 1
+1 invMod 2 = 1
+3 extended gcd 9 = 3
+3 invMod 9 = 0
+2 extended gcd 8 = 2
+2 invMod 8 = 0
+6 extended gcd 6 = 6
+6 invMod 6 = 0
+5 extended gcd 6 = 1
+5 invMod 6 = 5
