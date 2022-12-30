@@ -1,5 +1,6 @@
 #include "BigIntConverter.h"
 #include "IO.h"
+#include <regex>
 
 using std::cout;
 using std::endl;
@@ -75,7 +76,6 @@ string BigIntConverter::byteToString(byte n, bool isReversed)
 	return res;
 }
 
-// Todo: cần có những hàm kiểm tra tính hợp lệ của chuỗi đầu vào
 BigInt BigIntConverter::binaryStrToBigInt(string binStr)
 {
 	int length = binStr.length();
@@ -169,8 +169,7 @@ string BigIntConverter::bigIntToDecimalStr(BigInt n)
 	return res;
 }
 
-// Bug: số âm đang được đọc thành số dương
-// Warn: tốc độ chuyển đổi là rất chậm
+// Warn: khi kích thước BigInt::maxByteCount không đủ có thể dẫn đến tràn số
 BigInt BigIntConverter::decimalStrToBigInt(string decStr)
 {
 	BigInt res = 0;
@@ -203,6 +202,12 @@ BigInt BigIntConverter::decimalStrToBigInt(string decStr)
 		d = digitToInt(decStr[0]);
 		res = res + d * i;
 	}
+
+	// Bỏ bớt các byte thừa
+	removeTrailingBytesIfNull(res);
+
+	// Làm tròn số byte cho thành có dạng 2^k
+	roundByteCount(res);
 
 	return res;
 }

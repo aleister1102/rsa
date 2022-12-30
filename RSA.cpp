@@ -107,7 +107,7 @@ string RSA::encrypt(string plainText, BigInt n, BigInt e) {
 
 	for (char character : plainText)
 	{
-		//io.writeLog("[RSA::encrypt] encrypt: " + to_string(character));
+		io.writeLog("[RSA::encrypt] encrypt: " + to_string(character));
 
 		BigInt m = (int)character;
 
@@ -115,17 +115,20 @@ string RSA::encrypt(string plainText, BigInt n, BigInt e) {
 
 		BigInt c = powMod(m, e, n);
 
-		//io.writeLog("[RSA::encrypt] cipher text: " + converter.bigIntToBinaryStr(c));
+		io.writeLog("[RSA::encrypt] cipher text: " + converter.bigIntToDecimalStr(c));
 
-		cipherText += (converter.bigIntToBinaryStr(c) + " ");
+		cipherText += (converter.bigIntToDecimalStr(c) + " ");
 	}
 
+	io.writeLog("[RSA::encrypt] finish encrypting!");
 	return cipherText;
 }
 
 string RSA::decrypt(string cipherText, BigInt n, BigInt d) {
 	string plainText = "";
 	string binStr = "";
+
+	io.writeLog("[RSA::decrypt] decrypting...");
 
 	for (char character : cipherText)
 	{
@@ -137,7 +140,7 @@ string RSA::decrypt(string cipherText, BigInt n, BigInt d) {
 		{
 			//io.writeLog("[RSA::decrypt] decrypt " + binStr);
 
-			BigInt c = converter.binaryStrToBigInt(binStr);
+			BigInt c = converter.decimalStrToBigInt(binStr);
 
 			BigInt m = powMod(c, d, n);
 
@@ -153,6 +156,7 @@ string RSA::decrypt(string cipherText, BigInt n, BigInt d) {
 		}
 	}
 
+	io.writeLog("[RSA::decrypt] finish decrypting: " + plainText);
 	return plainText;
 }
 
@@ -238,17 +242,20 @@ void RSA::test()
 	//BigInt q = converter.binaryStrToBigInt("000000000000001010000010000010101011110010111100101101001000011000110011");
 	//RSA rsa(p, q);
 
-	BigInt::maxByteCount = 256 / 8;
+	BigInt n = converter.decimalStrToBigInt("3332934698137425361660362443025144786509522466962699924195150122084633952149");
+	io.writeOutput("[RSA::test] n: " + converter.bigIntToDecimalStr(n));
 
-	BigInt n = converter.binaryStrToBigInt("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001011011001100000110011110000011011110000001000011011011011000101010011011111001111011110011010101101010010000011");
+	BigInt::maxByteCount = n.byteCount;
 
 	// Mã hóa
-	BigInt e = converter.binaryStrToBigInt("0000001101011010000010110001110000111111111111011100101010000011");
+	BigInt e = converter.decimalStrToBigInt("169093636435538073422978025304282854731");
+	io.writeOutput("[RSA::test] e: " + converter.bigIntToDecimalStr(e));
+
 	RSA::encryptFile("plain.txt", n, e, "cipher.txt");
 
 	// Giải mã
-	BigInt d = converter.binaryStrToBigInt("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111100100110011111000100010101111100011101110011011111011011101110010011101111100000111100001111000000000001011");
-	RSA::decryptFile("cipher.txt", n, d, "decrypted.txt");
+	//BigInt d = converter.decimalStrToBigInt("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111100100110011111000100010101111100011101110011011111011011101110010011101111100000111100001111000000000001011");
+	//RSA::decryptFile("cipher.txt", n, d, "decrypted.txt");
 }
 
 BigInt RSA::getD()

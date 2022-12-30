@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "BigInt.h"
 #include "BigIntConverter.h"
 #include <vector>
@@ -12,6 +12,12 @@ using std::ios;
 
 class IO
 {
+public:
+	// TODO: chuyển các hàm dưới qua lớp utils
+	bool isFileExisted(string filename);
+	bool isValidBinaryStr(string binStr);
+	bool isValidDecimalStr(string decStr);
+
 public:
 	void clearFile(string filename);
 

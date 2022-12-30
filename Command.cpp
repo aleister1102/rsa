@@ -1,6 +1,7 @@
 ﻿#include "Command.h"
 #include "RSA.h"
 #include "BigIntConverter.h"
+#include "IO.h"
 #include <fstream>
 
 using std::cout;
@@ -101,8 +102,8 @@ int runKeyFormatMenu()
 
 	do {
 		cout << "==== Choose key format ====\n";
-		cout << "1. Binary (recommended)\n";
-		cout << "2. Decimal\n";
+		cout << "1. Decimal\n";
+		cout << "2. Binary (recommended)\n";
 		cout << "Select your option: ";
 		cin >> option;
 		system("cls");
@@ -123,6 +124,7 @@ void Command::runCommand(int command)
 		uint32_t maxByteCount = keySize / 8;
 		BigInt::maxByteCount = maxByteCount;
 		RSA rsa(maxByteCount);
+
 		rsa.exportKeys(exportMethod);
 
 		break;
@@ -131,23 +133,47 @@ void Command::runCommand(int command)
 	{
 		int keyFormat = runKeyFormatMenu();
 
-		string nStr; cout << "Enter public key n: "; cin >> nStr;
-		string eStr; cout << "Enter public key d: "; cin >> eStr;
-		string plainTextFile; cout << "Enter plain text file: "; cin >> plainTextFile;
-		string cipherTextFile; cout << "Enter cipher text file: "; cin >> cipherTextFile;
-
 		BigInt n, e;
 		if (keyFormat == 1)
 		{
-			// TODO: cần set maxByteCount khi đọc được chuỗi
-			n = converter.binaryStrToBigInt(nStr);
-			e = converter.binaryStrToBigInt(eStr);
+			string nStr, eStr;
+			do {
+				cout << "[Encrypt] enter public key n: "; cin >> nStr;
+			} while (!io.isValidDecimalStr(nStr));
+			do {
+				cout << "[Encrypt] enter public key e: "; cin >> eStr;
+			} while (!io.isValidDecimalStr(eStr));
+
+			n = converter.decimalStrToBigInt(nStr);
+			e = converter.decimalStrToBigInt(eStr);
+
+			BigInt::maxByteCount = getMaxByteCount(n.byteCount, e.byteCount);
+			io.writeLog("[Command::runCommand] maxByteCount: " + std::to_string(BigInt::maxByteCount));
 		}
 		else if (keyFormat == 2)
 		{
-			n = converter.decimalStrToBigInt(nStr);
-			e = converter.decimalStrToBigInt(eStr);
+			string nStr, eStr;
+			do {
+				cout << "[Encrypt] enter public key n: "; cin >> nStr;
+			} while (!io.isValidBinaryStr(nStr));
+			do {
+				cout << "[Encrypt] enter public key e: "; cin >> eStr;
+			} while (!io.isValidBinaryStr(eStr));
+
+			n = converter.binaryStrToBigInt(nStr);
+			e = converter.binaryStrToBigInt(eStr);
+
+			BigInt::maxByteCount = getMaxByteCount(n.byteCount, e.byteCount);
+			io.writeLog("[Command::runCommand] maxByteCount: " + std::to_string(BigInt::maxByteCount));
 		}
+
+		string plainTextFile, cipherTextFile;
+		do {
+			cout << "[Encrypt] enter plain text file name: "; cin >> plainTextFile;
+		} while (!io.isFileExisted(plainTextFile));
+		do {
+			cout << "[Encrypt] enter cipher text file name: "; cin >> cipherTextFile;
+		} while (!io.isFileExisted(cipherTextFile));
 
 		RSA::encryptFile(plainTextFile, n, e, cipherTextFile);
 
@@ -160,34 +186,67 @@ void Command::runCommand(int command)
 
 		if (keyType == 1)
 		{
-			string nStr; cout << "Enter n: "; cin >> nStr;
-			string dStr; cout << "Enter d: "; cin >> dStr;
-			string cipherTextFile; cout << "Enter cipher text file: "; cin >> cipherTextFile;
-			string plainTextFile; cout << "Enter plain text file: "; cin >> plainTextFile;
-
 			BigInt n, d;
 			if (keyFormat == 1)
 			{
-				n = converter.binaryStrToBigInt(nStr);
-				d = converter.binaryStrToBigInt(dStr);
+				string nStr, dStr;
+				do {
+					cout << "[Encrypt] enter public key n: "; cin >> nStr;
+				} while (!io.isValidDecimalStr(nStr));
+				do {
+					cout << "[Encrypt] enter public key e: "; cin >> dStr;
+				} while (!io.isValidDecimalStr(dStr));
+
+				n = converter.decimalStrToBigInt(nStr);
+				d = converter.decimalStrToBigInt(dStr);
+
+				BigInt::maxByteCount = getMaxByteCount(n.byteCount, d.byteCount);
+				io.writeLog("[Command::runCommand] maxByteCount: " + std::to_string(BigInt::maxByteCount));
 			}
 			else if (keyFormat == 2)
 			{
-				n = converter.decimalStrToBigInt(nStr);
-				d = converter.decimalStrToBigInt(dStr);
+				string nStr, dStr;
+				do {
+					cout << "[Encrypt] enter public key n: "; cin >> nStr;
+				} while (!io.isValidBinaryStr(nStr));
+				do {
+					cout << "[Encrypt] enter public key e: "; cin >> dStr;
+				} while (!io.isValidBinaryStr(dStr));
+
+				n = converter.binaryStrToBigInt(nStr);
+				d = converter.binaryStrToBigInt(dStr);
+
+				BigInt::maxByteCount = getMaxByteCount(n.byteCount, d.byteCount);
+				io.writeLog("[Command::runCommand] maxByteCount: " + std::to_string(BigInt::maxByteCount));
 			}
+
+			string cipherTextFile, plainTextFile;
+			do {
+				cout << "[Decrypt] enter cipher text file name: "; cin >> cipherTextFile;
+			} while (!io.isFileExisted(cipherTextFile));
+
+			do {
+				cout << "[Decrypt] enter decrypted plain text file name: "; cin >> plainTextFile;
+			} while (!io.isFileExisted(plainTextFile));
 
 			RSA::decryptFile(cipherTextFile, n, d, plainTextFile);
 		}
 		else if (keyType == 2)
 		{
 			int keySize = runKeySizeMenu();
+
+			string cipherTextFile, plainTextFile;
+			do {
+				cout << "[Decrypt] enter cipher text file name: "; cin >> cipherTextFile;
+			} while (!io.isFileExisted(cipherTextFile));
+
+			do {
+				cout << "[Decrypt] enter decrypted plain text file name: "; cin >> plainTextFile;
+			} while (!io.isFileExisted(plainTextFile));
+
 			uint32_t maxByteCount = keySize / 8;
 			BigInt::maxByteCount = maxByteCount;
 			RSA rsa(maxByteCount);
-
-			string cipherTextFile; cout << "Enter cipher text file: "; cin >> cipherTextFile;
-			string plainTextFile; cout << "Enter plain text file: "; cin >> plainTextFile;
 
 			RSA::decryptFile(cipherTextFile, rsa.n, rsa.getD(), plainTextFile);
 		}

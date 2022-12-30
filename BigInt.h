@@ -87,15 +87,21 @@ public:
 	bool isPrime(int k);
 };
 
+uint32_t getMaxByteCount(uint32_t a, uint32_t b);
+
 byte getLastByte(const BigInt& n);
 
 void removeLastByteIfNull(BigInt& n);
 
 void removeTrailingBytesIfNull(BigInt& n);
 
+void removeExceedingByte(BigInt& n);
+
 uint32_t getBitLength(BigInt n);
 
 void addMoreBytes(BigInt& n, int amount);
+
+void roundByteCount(BigInt& n);
 
 BigInt abs(BigInt n);
 

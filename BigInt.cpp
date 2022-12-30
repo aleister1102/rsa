@@ -202,6 +202,17 @@ uint32_t shareByteCount(BigInt& a, BigInt& b)
 	return extraByteAmount;
 }
 
+void roundByteCount(BigInt& n)
+{
+	int k = 0; uint32_t byteCount = n.byteCount;
+
+	while (byteCount > 1) { byteCount >>= 1; k++; }
+
+	int missingByteCount = pow(2, k) - n.byteCount;
+
+	if (missingByteCount > 0) addMoreBytes(n, missingByteCount);
+}
+
 BigInt twoComplement(BigInt n)
 {
 	if (n.isZero()) return n;

@@ -8,6 +8,36 @@ using std::fstream;
 using std::make_tuple;
 using std::cin;
 
+bool IO::isValidBinaryStr(string binStr)
+{
+	for (char c : binStr)
+	{
+		if (c - '0' > 1)
+			return false;
+	}
+
+	return true;
+}
+
+bool IO::isValidDecimalStr(string decStr)
+{
+	for (char c : decStr)
+	{
+		if (!isdigit(c))
+			return false;
+	}
+
+	return true;
+}
+
+bool IO::isFileExisted(string filename)
+{
+	fstream fs(filename, ios::in);
+	bool isExisted = fs.is_open();
+	if (!isExisted) io.writeConsole("File '" + filename + "' is not existed");
+	return isExisted;
+}
+
 void IO::clearFile(string filename)
 {
 	fstream f(filename, ios::out);
@@ -139,7 +169,7 @@ bool IO::openFile(fstream& fs, string filename, ios::openmode mode)
 
 	if (!fs.is_open())
 	{
-		io.writeOutput("[IO::openFileForRead] file: " + filename + " is not existed");
+		io.writeLog("[IO::openFile] file: " + filename + " is not existed");
 		return false;
 	}
 	else {
