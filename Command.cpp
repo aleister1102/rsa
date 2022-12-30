@@ -138,10 +138,10 @@ void Command::runCommand(int command)
 		{
 			string nStr, eStr;
 			do {
-				cout << "[Encrypt] enter public key n: "; cin >> nStr;
+				cout << "[Encrypt] enter decimal public key n: "; cin >> nStr;
 			} while (!io.isValidDecimalStr(nStr));
 			do {
-				cout << "[Encrypt] enter public key e: "; cin >> eStr;
+				cout << "[Encrypt] enter decimal public key e: "; cin >> eStr;
 			} while (!io.isValidDecimalStr(eStr));
 
 			n = converter.decimalStrToBigInt(nStr);
@@ -154,10 +154,10 @@ void Command::runCommand(int command)
 		{
 			string nStr, eStr;
 			do {
-				cout << "[Encrypt] enter public key n: "; cin >> nStr;
+				cout << "[Encrypt] enter binary public key n: "; cin >> nStr;
 			} while (!io.isValidBinaryStr(nStr));
 			do {
-				cout << "[Encrypt] enter public key e: "; cin >> eStr;
+				cout << "[Encrypt] enter binary public key e: "; cin >> eStr;
 			} while (!io.isValidBinaryStr(eStr));
 
 			n = converter.binaryStrToBigInt(nStr);
@@ -191,10 +191,10 @@ void Command::runCommand(int command)
 			{
 				string nStr, dStr;
 				do {
-					cout << "[Encrypt] enter public key n: "; cin >> nStr;
+					cout << "[Encrypt] enter decimal public key n: "; cin >> nStr;
 				} while (!io.isValidDecimalStr(nStr));
 				do {
-					cout << "[Encrypt] enter public key e: "; cin >> dStr;
+					cout << "[Encrypt] enter decimal private key d: "; cin >> dStr;
 				} while (!io.isValidDecimalStr(dStr));
 
 				n = converter.decimalStrToBigInt(nStr);
@@ -207,10 +207,10 @@ void Command::runCommand(int command)
 			{
 				string nStr, dStr;
 				do {
-					cout << "[Encrypt] enter public key n: "; cin >> nStr;
+					cout << "[Encrypt] enter binary public key n: "; cin >> nStr;
 				} while (!io.isValidBinaryStr(nStr));
 				do {
-					cout << "[Encrypt] enter public key e: "; cin >> dStr;
+					cout << "[Encrypt] enter binary private key d: "; cin >> dStr;
 				} while (!io.isValidBinaryStr(dStr));
 
 				n = converter.binaryStrToBigInt(nStr);

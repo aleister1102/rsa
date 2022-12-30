@@ -144,7 +144,7 @@ string RSA::decrypt(string cipherText, BigInt n, BigInt d) {
 
 			BigInt m = powMod(c, d, n);
 
-			//io.writeLog("[RSA::encrypt] ascii value: " + converter.bigIntToBinaryStr(m));
+			io.writeLog("[RSA::encrypt] ascii value: " + converter.bigIntToDecimalStr(m));
 
 			int ascii = m.getIntValue();
 
