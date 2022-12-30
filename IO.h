@@ -25,6 +25,7 @@ public:
 	void writeBinaryOutputs(BigInt a, BigInt b, BigInt res, string op);
 
 	void writeLog(string log);
+	void writeConsole(string output);
 
 	bool openFile(fstream& fs, string filename, ios::openmode mode);
 	string readContent(fstream& fs);

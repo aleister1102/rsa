@@ -36,6 +36,9 @@
     <ClCompile Include="RSA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Command.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BigInt.h">
@@ -56,6 +59,9 @@
     <ClInclude Include="RSA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
@@ -73,7 +79,10 @@
     <Text Include="plain.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="decrypted_plain.txt">
+    <Text Include="decrypted.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="keys.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

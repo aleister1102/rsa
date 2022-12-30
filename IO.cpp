@@ -128,6 +128,11 @@ void IO::writeLog(string log)
 	f.close();
 }
 
+void IO::writeConsole(string output)
+{
+	std::cout << output << endl;
+}
+
 bool IO::openFile(fstream& fs, string filename, ios::openmode mode)
 {
 	fs.open(filename, mode);

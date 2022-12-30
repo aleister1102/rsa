@@ -5,8 +5,6 @@
 
 typedef unsigned char byte;
 
-constexpr uint32_t MAXBYTE = 64 / 8;
-
 static byte zero;
 
 static byte ByteMask[8] = {
@@ -25,6 +23,7 @@ class BigInt
 public:
 	byte* bytes;
 	uint32_t byteCount;
+	static inline uint32_t maxByteCount = 128 / 8;
 
 public:
 	BigInt() : bytes(nullptr), byteCount(0) {}
@@ -104,24 +103,12 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r);
 
 BigInt twoComplement(BigInt n);
 
-BigInt gcd(BigInt a, BigInt b);
-
-std::tuple<BigInt, BigInt, BigInt> extendedEuclidean(BigInt a, BigInt b);
-
-BigInt inverseMod(BigInt a, BigInt m);
-
-BigInt powMod(BigInt n, BigInt e, BigInt m);
-
-bool millerRabinTest(BigInt n, BigInt d);
-
 BigInt operator + (BigInt a, BigInt b);
 BigInt operator + (BigInt a, int value);
-
 void operator +=(BigInt& a, BigInt b);
 
 BigInt operator - (BigInt a, BigInt b);
 BigInt operator - (BigInt a, int value);
-
 void operator -=(BigInt& a, BigInt b);
 
 bool operator == (BigInt a, BigInt b);
@@ -135,10 +122,6 @@ void operator >>= (BigInt& a, int steps);
 
 BigInt operator << (BigInt a, int steps);
 void operator <<= (BigInt& a, int steps);
-
-BigInt operator &(BigInt a, BigInt b);
-
-BigInt operator |(BigInt a, BigInt b);
 
 // Chỉ xét trong phạm vi số byte lớn nhất của 2 số
 // Ví dụ với số 1 byte thì 0111 1111 sẽ là số dương

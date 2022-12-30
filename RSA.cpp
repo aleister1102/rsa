@@ -1,10 +1,16 @@
 ﻿#include "RSA.h"
-#include "BigIntRandom.h"
 #include "IO.h"
+#include "Algorithm.h"
+#include "BigIntRandom.h"
 #include <fstream>
 
 using std::cout;
 using std::to_string;
+
+string RSA::N() { return converter.bigIntToDecimalStr(n); }
+string RSA::E() { return converter.bigIntToDecimalStr(e); }
+string RSA::D() { return converter.bigIntToDecimalStr(d); }
+string RSA::PHI() { return converter.bigIntToDecimalStr(phi); }
 
 RSA::RSA(uint32_t byteCount)
 {
@@ -14,7 +20,7 @@ RSA::RSA(uint32_t byteCount)
 	generatePrimes();
 
 	//// Tính n và phi
-	calculatePhiAndN();
+	calculateNandPhi();
 
 	//// Sinh khóa e nguyên tố cùng nhau với phi
 	generateEncryptionKey();
@@ -29,75 +35,87 @@ RSA::RSA(BigInt p, BigInt q)
 	this->p = p;
 	this->q = q;
 
-	calculatePhiAndN();
+	calculateNandPhi();
 	generateEncryptionKey();
 	generateDecryptionKey();
 }
 
 void RSA::generatePrimes()
 {
-	io.writeOutput("[RSA::generatePrimes] generating p and q...");
+	io.writeConsole("Generating p and q...");
 
 	do {
 		p = random.next(byteCount);
-	} while (p.isPrime(CHECK_PRIME_LOOPS) == false);
+		io.writeLog("[RSA::generatePrimes] random p: " + converter.bigIntToBinaryStr(p));
+	} while (p.isPrime(RSA::checkPrimeLoops) == false);
 
-	io.writeOutput("[RSA::generatePrimes] random p: " + converter.bigIntToBinaryStr(p));
+	io.writeOutput("[RSA::generatePrimes] prime p: " + converter.bigIntToBinaryStr(p));
 
 	do {
 		q = random.next(byteCount);
-	} while (q.isPrime(CHECK_PRIME_LOOPS) == false);
+		io.writeLog("[RSA::generatePrimes] random q: " + converter.bigIntToBinaryStr(p));
+	} while (q.isPrime(RSA::checkPrimeLoops) == false);
 
-	io.writeOutput("[RSA::generatePrimes] random q: " + converter.bigIntToBinaryStr(q));
+	io.writeOutput("[RSA::generatePrimes] prime q: " + converter.bigIntToBinaryStr(q));
+
+	io.writeConsole("Finish generating p and q!");
 }
 
-void RSA::calculatePhiAndN()
+void RSA::calculateNandPhi()
 {
-	phi = (p - 1) * (q - 1);
+	io.writeConsole("Calculating n and phi...");
+
 	n = p * q;
+	phi = (p - 1) * (q - 1);
+	io.writeOutput("[RSA::RSA] n: " + N());
 	io.writeOutput("[RSA::RSA] phi: " + converter.bigIntToBinaryStr(phi));
-	io.writeOutput("[RSA::RSA] n: " + converter.bigIntToBinaryStr(n));
+
+	io.writeConsole("Finish calculating n and phi!");
 }
 
 void RSA::generateEncryptionKey()
 {
 	if (phi == 0) return;
 
-	io.writeOutput("[RSA::generateEncryptionKey] generating encryption key e...");
+	io.writeConsole("Generating encryption key e...");
 
 	do {
 		e = random.next(byteCount);
 		if (e.isEven()) continue; // e cần phải lẻ
 	} while (gcd(e, phi) != 1);
 
-	io.writeOutput("[RSA::generateEncryptionKey] encryption key: " + converter.bigIntToBinaryStr(e));
+	io.writeConsole("Finish generating encryption key e!");
+	io.writeOutput("[RSA::generateEncryptionKey] e: " + E());
 }
 
 void RSA::generateDecryptionKey()
 {
 	if (phi == 0 || e == 0) return;
 
-	io.writeOutput("[RSA::generateDecryptionKey] generating decryption key d...");
+	io.writeConsole("Generating decryption key d...");
 
 	d = inverseMod(e, phi);
 
-	io.writeOutput("[RSA::generateDecryptionKey] decryption key: " + converter.bigIntToBinaryStr(d));
+	io.writeConsole("Finish generating decryption key d!");
+	io.writeOutput("[RSA::generateDecryptionKey] d: " + D());
 }
 
 string RSA::encrypt(string plainText, BigInt n, BigInt e) {
 	string cipherText = "";
 
+	io.writeLog("[RSA::encrypt] encrypting " + plainText);
+
 	for (char character : plainText)
 	{
-		io.writeLog("[RSA::encrypt] encrypt: " + to_string(character));
+		//io.writeLog("[RSA::encrypt] encrypt: " + to_string(character));
 
 		BigInt m = (int)character;
 
-		io.writeLog("[RSA::encrypt] ascii value: " + converter.bigIntToBinaryStr(m));
+		//io.writeLog("[RSA::encrypt] ascii value: " + converter.bigIntToBinaryStr(m));
 
 		BigInt c = powMod(m, e, n);
 
-		io.writeLog("[RSA::encrypt] cipher text: " + converter.bigIntToBinaryStr(c));
+		//io.writeLog("[RSA::encrypt] cipher text: " + converter.bigIntToBinaryStr(c));
 
 		cipherText += (converter.bigIntToBinaryStr(c) + " ");
 	}
@@ -117,17 +135,17 @@ string RSA::decrypt(string cipherText, BigInt n, BigInt d) {
 		// Nếu gặp khoảng trắng thì tiến hành chuyển chuỗi các số về dạng ascii
 		else
 		{
-			io.writeLog("[RSA::decrypt] decrypt " + binStr);
+			//io.writeLog("[RSA::decrypt] decrypt " + binStr);
 
 			BigInt c = converter.binaryStrToBigInt(binStr);
 
 			BigInt m = powMod(c, d, n);
 
-			io.writeLog("[RSA::encrypt] ascii value: " + converter.bigIntToBinaryStr(m));
+			//io.writeLog("[RSA::encrypt] ascii value: " + converter.bigIntToBinaryStr(m));
 
 			int ascii = m.getIntValue();
 
-			io.writeLog("[RSA::encrypt] ascii value as int: " + to_string(ascii));
+			//io.writeLog("[RSA::encrypt] ascii value as int: " + to_string(ascii));
 
 			plainText += char(ascii);
 
@@ -140,7 +158,7 @@ string RSA::decrypt(string cipherText, BigInt n, BigInt d) {
 
 void RSA::encryptFile(string plainTextFile, BigInt n, BigInt e, string cipherTextFile)
 {
-	io.writeOutput("[RSA::encryptFile] encrypting " + plainTextFile);
+	io.writeConsole("[RSA::encryptFile] encrypting " + plainTextFile);
 
 	fstream pfs, cfs;
 	if (io.openFile(pfs, plainTextFile, ios::in) == false) return;
@@ -153,12 +171,12 @@ void RSA::encryptFile(string plainTextFile, BigInt n, BigInt e, string cipherTex
 	pfs.close();
 	cfs.close();
 
-	io.writeOutput("[RSA::encryptFile] finish encrypting!");
+	io.writeConsole("[RSA::encryptFile] finish encrypting!");
 }
 
 void RSA::decryptFile(string cipherTextFile, BigInt n, BigInt d, string plainTextFile)
 {
-	io.writeOutput("[RSA::decryptFile] decrypting " + cipherTextFile);
+	io.writeConsole("[RSA::decryptFile] decrypting " + cipherTextFile);
 
 	fstream cfs, pfs;
 	if (io.openFile(cfs, cipherTextFile, ios::in) == false) return;
@@ -171,7 +189,46 @@ void RSA::decryptFile(string cipherTextFile, BigInt n, BigInt d, string plainTex
 	cfs.close();
 	pfs.close();
 
-	io.writeOutput("[RSA::decryptFile] finish decrypting!");
+	io.writeConsole("[RSA::decryptFile] finish decrypting!");
+}
+
+string RSA::getKeys()
+{
+	string keys;
+
+	keys += "n: " + N() + '\n';
+	keys += "e: " + E() + '\n';
+	keys += "d: " + D() + '\n';
+	keys += "phi: " + PHI() + '\n';
+
+	return keys;
+}
+
+void RSA::exportKeys(int exportMethod)
+{
+	io.writeConsole("Exporting keys...");
+
+	fstream fs("keys.txt", ios::out);
+	if (fs.is_open() == false) return;
+
+	string keys = getKeys();
+
+	if (exportMethod == 1)
+	{
+		fs << keys;
+		io.writeConsole("Finish exporting keys! Please check 'keys.txt'");
+	}
+	else if (exportMethod == 2)
+	{
+		cout << keys;
+		io.writeConsole("Finish exporting keys!");
+	}
+	else if (exportMethod == 3)
+	{
+		fs << keys;
+		cout << keys;
+		io.writeConsole("Finish exporting keys! Please check 'keys.txt'");
+	}
 }
 
 void RSA::test()
@@ -181,6 +238,8 @@ void RSA::test()
 	//BigInt q = converter.binaryStrToBigInt("000000000000001010000010000010101011110010111100101101001000011000110011");
 	//RSA rsa(p, q);
 
+	BigInt::maxByteCount = 256 / 8;
+
 	BigInt n = converter.binaryStrToBigInt("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001011011001100000110011110000011011110000001000011011011011000101010011011111001111011110011010101101010010000011");
 
 	// Mã hóa
@@ -189,5 +248,10 @@ void RSA::test()
 
 	// Giải mã
 	BigInt d = converter.binaryStrToBigInt("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111100100110011111000100010101111100011101110011011111011011101110010011101111100000111100001111000000000001011");
-	RSA::decryptFile("cipher.txt", n, d, "decrypted_plain.txt");
+	RSA::decryptFile("cipher.txt", n, d, "decrypted.txt");
+}
+
+BigInt RSA::getD()
+{
+	return d;
 }

@@ -131,6 +131,7 @@
     <ClCompile Include="Algorithm.cpp" />
     <ClCompile Include="BigInt.cpp" />
     <ClCompile Include="BigIntConverter.cpp" />
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="IO.cpp" />
     <ClCompile Include="BigIntRandom.cpp" />
     <ClCompile Include="main.cpp" />
@@ -140,14 +141,16 @@
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="BigInt.h" />
     <ClInclude Include="BigIntConverter.h" />
+    <ClInclude Include="Command.h" />
     <ClInclude Include="IO.h" />
     <ClInclude Include="BigIntRandom.h" />
     <ClInclude Include="RSA.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="cipher.txt" />
-    <Text Include="decrypted_plain.txt" />
+    <Text Include="decrypted.txt" />
     <Text Include="input.txt" />
+    <Text Include="keys.txt" />
     <Text Include="log.txt" />
     <Text Include="output.txt" />
     <Text Include="plain.txt" />
