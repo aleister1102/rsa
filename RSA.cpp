@@ -7,11 +7,6 @@
 using std::cout;
 using std::to_string;
 
-string RSA::N() { return converter.bigIntToDecimalStr(n); }
-string RSA::E() { return converter.bigIntToDecimalStr(e); }
-string RSA::D() { return converter.bigIntToDecimalStr(d); }
-string RSA::PHI() { return converter.bigIntToDecimalStr(phi); }
-
 RSA::RSA(uint32_t byteCount)
 {
 	this->byteCount = byteCount;
@@ -26,17 +21,6 @@ RSA::RSA(uint32_t byteCount)
 	generateEncryptionKey();
 
 	//// Sinh khóa d là nghịch đảo modulo của e
-	generateDecryptionKey();
-}
-
-RSA::RSA(BigInt p, BigInt q)
-{
-	this->byteCount = p.byteCount;
-	this->p = p;
-	this->q = q;
-
-	calculateNandPhi();
-	generateEncryptionKey();
 	generateDecryptionKey();
 }
 
@@ -67,7 +51,7 @@ void RSA::calculateNandPhi()
 
 	n = p * q;
 	phi = (p - 1) * (q - 1);
-	io.writeOutput("[RSA::RSA] n: " + N());
+	io.writeOutput("[RSA::RSA] n: " + converter.bigIntToDecimalStr(n));
 	io.writeOutput("[RSA::RSA] phi: " + converter.bigIntToBinaryStr(phi));
 
 	io.writeConsole("Finish calculating n and phi!");
@@ -85,7 +69,7 @@ void RSA::generateEncryptionKey()
 	} while (gcd(e, phi) != 1);
 
 	io.writeConsole("Finish generating encryption key e!");
-	io.writeOutput("[RSA::generateEncryptionKey] e: " + E());
+	io.writeOutput("[RSA::generateEncryptionKey] e: " + converter.bigIntToDecimalStr(e));
 }
 
 void RSA::generateDecryptionKey()
@@ -97,10 +81,10 @@ void RSA::generateDecryptionKey()
 	d = inverseMod(e, phi);
 
 	io.writeConsole("Finish generating decryption key d!");
-	io.writeOutput("[RSA::generateDecryptionKey] d: " + D());
+	io.writeOutput("[RSA::generateDecryptionKey] d: " + converter.bigIntToDecimalStr(d));
 }
 
-string RSA::encrypt(string plainText, BigInt n, BigInt e) {
+string RSA::encrypt(string plainText) {
 	string cipherText = "";
 
 	io.writeLog("[RSA::encrypt] encrypting " + plainText);
@@ -124,7 +108,7 @@ string RSA::encrypt(string plainText, BigInt n, BigInt e) {
 	return cipherText;
 }
 
-string RSA::decrypt(string cipherText, BigInt n, BigInt d) {
+string RSA::decrypt(string cipherText) {
 	string plainText = "";
 	string binStr = "";
 
@@ -160,62 +144,78 @@ string RSA::decrypt(string cipherText, BigInt n, BigInt d) {
 	return plainText;
 }
 
-void RSA::encryptFile(string plainTextFile, BigInt n, BigInt e, string cipherTextFile)
+void RSA::encryptFile(string plainTextFile, string cipherTextFile)
 {
-	io.writeConsole("[RSA::encryptFile] encrypting " + plainTextFile);
+	io.writeConsole("Encrypting " + plainTextFile);
 
 	fstream pfs, cfs;
 	if (io.openFile(pfs, plainTextFile, ios::in) == false) return;
 	if (io.openFile(cfs, cipherTextFile, ios::out) == false) return;
 
 	string plainText = io.readContent(pfs);
-	string cipherText = encrypt(plainText, n, e);
+	string cipherText = encrypt(plainText);
 	io.writeOutput(cfs, cipherText);
 
 	pfs.close();
 	cfs.close();
 
-	io.writeConsole("[RSA::encryptFile] finish encrypting!");
+	io.writeConsole("Finish encrypting!");
 }
 
-void RSA::decryptFile(string cipherTextFile, BigInt n, BigInt d, string plainTextFile)
+void RSA::decryptFile(string cipherTextFile, string plainTextFile)
 {
-	io.writeConsole("[RSA::decryptFile] decrypting " + cipherTextFile);
+	io.writeConsole("Decrypting " + cipherTextFile);
 
 	fstream cfs, pfs;
 	if (io.openFile(cfs, cipherTextFile, ios::in) == false) return;
 	if (io.openFile(pfs, plainTextFile, ios::out) == false) return;
 
 	string cipherText = io.readContent(cfs);
-	string plainText = decrypt(cipherText, n, d);
+	string plainText = decrypt(cipherText);
 	io.writeOutput(pfs, plainText);
 
 	cfs.close();
 	pfs.close();
 
-	io.writeConsole("[RSA::decryptFile] finish decrypting!");
+	io.writeConsole("Finish decrypting!");
 }
 
 string RSA::getKeys()
 {
 	string keys;
 
-	keys += "n: " + N() + '\n';
-	keys += "e: " + E() + '\n';
-	keys += "d: " + D() + '\n';
-	keys += "phi: " + PHI() + '\n';
+	keys += "n: " + converter.bigIntToDecimalStr(n) + '\n';
+	keys += "e: " + converter.bigIntToDecimalStr(e) + '\n';
+	keys += "d: " + converter.bigIntToDecimalStr(d) + '\n';
+	keys += "phi: " + converter.bigIntToDecimalStr(phi) + '\n';
 
 	return keys;
 }
 
-void RSA::exportKeys(int exportMethod)
+string RSA::getBinaryKeys()
+{
+	string keys;
+
+	keys += "n: " + converter.bigIntToBinaryStr(n) + '\n';
+	keys += "e: " + converter.bigIntToBinaryStr(e) + '\n';
+	keys += "d: " + converter.bigIntToBinaryStr(d) + '\n';
+	keys += "phi: " + converter.bigIntToBinaryStr(phi) + '\n';
+
+	return keys;
+}
+
+void RSA::exportKeys(int format, int exportMethod)
 {
 	io.writeConsole("Exporting keys...");
 
 	fstream fs("keys.txt", ios::out);
 	if (fs.is_open() == false) return;
 
-	string keys = getKeys();
+	string keys = "";
+	if (format == 10)
+		keys = getKeys();
+	else if (format == 2)
+		keys = getBinaryKeys();
 
 	if (exportMethod == 1)
 	{
@@ -235,8 +235,7 @@ void RSA::exportKeys(int exportMethod)
 	}
 }
 
-void RSA::test()
-{
+void testRSA() {
 	// Sinh khóa từ hai số p và q cho trước (cũng có thể sinh ngẫu nhiên nếu muốn)
 	//BigInt p = converter.binaryStrToBigInt("0000000001001000101110000010000011001001010011100000100001110001");
 	//BigInt q = converter.binaryStrToBigInt("000000000000001010000010000010101011110010111100101101001000011000110011");
@@ -247,15 +246,18 @@ void RSA::test()
 
 	BigInt::maxByteCount = n.byteCount;
 
-	// Mã hóa
 	BigInt e = converter.decimalStrToBigInt("169093636435538073422978025304282854731");
 	io.writeOutput("[RSA::test] e: " + converter.bigIntToDecimalStr(e));
 
-	RSA::encryptFile("plain.txt", n, e, "cipher.txt");
+	BigInt d = converter.decimalStrToBigInt("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111100100110011111000100010101111100011101110011011111011011101110010011101111100000111100001111000000000001011");
+
+	RSA rsa(n, e, d);
+
+	// Mã hóa
+	rsa.encryptFile("plain.txt", "cipher.txt");
 
 	// Giải mã
-	//BigInt d = converter.decimalStrToBigInt("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111100100110011111000100010101111100011101110011011111011011101110010011101111100000111100001111000000000001011");
-	//RSA::decryptFile("cipher.txt", n, d, "decrypted.txt");
+	rsa.decryptFile("cipher.txt", "decrypted.txt");
 }
 
 BigInt RSA::getD()

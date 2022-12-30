@@ -1,3 +1,13 @@
-[Command::runCommand] maxByteCount: 32
 [RSA::decrypt] decrypting...
+[RSA::encrypt] ascii value: 72
+[RSA::encrypt] ascii value: 101
+[RSA::encrypt] ascii value: 108
+[RSA::encrypt] ascii value: 108
+[RSA::encrypt] ascii value: 111
+[RSA::encrypt] ascii value: 32
+[RSA::encrypt] ascii value: 119
+[RSA::encrypt] ascii value: 111
+[RSA::encrypt] ascii value: 114
+[RSA::encrypt] ascii value: 108
+[RSA::encrypt] ascii value: 100
 [RSA::decrypt] finish decrypting: Hello world

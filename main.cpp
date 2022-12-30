@@ -94,7 +94,7 @@ int main()
 	io.clearFile("log.txt");
 	io.clearFile("output.txt");
 
-	Command::runCommandMenu();
+	Command::run();
 	//RSA::test();
 	//test();
 

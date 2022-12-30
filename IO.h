@@ -35,6 +35,12 @@ public:
 
 	bool openFile(fstream& fs, string filename, ios::openmode mode);
 	string readContent(fstream& fs);
+
+public:
+	// Format: 10 - thập phân | 2 - nhị phân
+	tuple<string, string, string> inputKeys(int format);
+	tuple<string, string> inputFilesForEncryption();
+	tuple<string, string> inputFilesForDecryption();
 };
 
 static IO io;

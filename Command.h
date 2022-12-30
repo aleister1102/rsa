@@ -1,13 +1,8 @@
 #pragma once
+#include "RSA.h"
 #include <iostream>
 
-constexpr int MAX_COMMANDS = 3;
-
-class Command
-{
+class Command {
 public:
-	static void runCommandMenu();
-
-private:
-	static void runCommand(int command);
+	static void run();
 };

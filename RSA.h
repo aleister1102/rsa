@@ -7,24 +7,25 @@ using std::string;
 class RSA
 {
 public:
-	static void test();
 	BigInt getD();
 
 public:
-	static string encrypt(string plainText, BigInt n, BigInt e);
-	static string decrypt(string cipherText, BigInt n, BigInt d);
-	static void encryptFile(string p, BigInt n, BigInt e, string c);
-	static void decryptFile(string c, BigInt n, BigInt d, string p);
-	void exportKeys(int exportMethod);
+	string encrypt(string plainText);
+	string decrypt(string cipherText);
+	void encryptFile(string p, string c);
+	void decryptFile(string c, string p);
+	void exportKeys(int format, int exportMethod);
 
 public:
+	RSA() {};
 	RSA(uint32_t byteCount);
-	RSA(BigInt p, BigInt q);
+	RSA(const RSA& other) { *this = other; }
+	RSA(BigInt n, BigInt e, BigInt d) : n(n), e(e), d(d) {};
 
 public:
 	BigInt n = 0;
 	BigInt e = 0;
-	uint32_t byteCount;
+	uint32_t byteCount = 0;
 	static inline int checkPrimeLoops = 5;
 
 private:
@@ -39,8 +40,5 @@ private:
 	void generateEncryptionKey();
 	void generateDecryptionKey();
 	string getKeys();
-	string N();
-	string E();
-	string D();
-	string PHI();
+	string getBinaryKeys();
 };

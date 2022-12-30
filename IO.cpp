@@ -2,11 +2,12 @@
 #include <fstream>
 #include <string>
 
+using std::cout;
+using std::cin;
 using std::endl;
 using std::ios;
 using std::fstream;
 using std::make_tuple;
-using std::cin;
 
 bool IO::isValidBinaryStr(string binStr)
 {
@@ -189,4 +190,62 @@ string IO::readContent(fstream& fs)
 	}
 
 	return content;
+}
+
+tuple<string, string, string> IO::inputKeys(int format) {
+	string nStr, eStr, dStr;
+
+	if (format == 10)
+	{
+		do {
+			cout << "[Encrypt] enter decimal public key n: "; cin >> nStr;
+		} while (!io.isValidDecimalStr(nStr));
+		do {
+			cout << "[Encrypt] enter decimal public key e: "; cin >> eStr;
+		} while (!io.isValidDecimalStr(eStr));
+		do {
+			cout << "[Encrypt] enter decimal private key d: "; cin >> dStr;
+		} while (!io.isValidDecimalStr(dStr));
+	}
+	else if (format == 2) {
+		do {
+			cout << "[Encrypt] enter binary public key n: "; cin >> nStr;
+		} while (!io.isValidBinaryStr(nStr));
+		do {
+			cout << "[Encrypt] enter binary public key e: "; cin >> eStr;
+		} while (!io.isValidBinaryStr(eStr));
+		do {
+			cout << "[Encrypt] enter binary private key d: "; cin >> dStr;
+		} while (!io.isValidBinaryStr(dStr));
+	}
+
+	return make_tuple(nStr, eStr, dStr);
+}
+
+tuple<string, string> IO::inputFilesForEncryption()
+{
+	string plainTextFile, cipherTextFile;
+
+	do {
+		cout << "[Encrypt] enter plain text file name: "; cin >> plainTextFile;
+	} while (!io.isFileExisted(plainTextFile));
+	do {
+		cout << "[Encrypt] enter cipher text file name: "; cin >> cipherTextFile;
+	} while (!io.isFileExisted(cipherTextFile));
+
+	return make_tuple(plainTextFile, cipherTextFile);
+}
+
+tuple<string, string> IO::inputFilesForDecryption()
+{
+	string cipherTextFile, decryptedFile;
+
+	do {
+		cout << "[Decrypt] enter cipher text file name: "; cin >> cipherTextFile;
+	} while (!io.isFileExisted(cipherTextFile));
+	do {
+		cout << "[Decrypt] enter decrypted plain text file name: "; cin >> decryptedFile;
+	} while (!io.isFileExisted(decryptedFile));
+
+	return make_tuple(cipherTextFile, decryptedFile);
 }
