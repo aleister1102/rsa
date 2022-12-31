@@ -2,6 +2,7 @@
 #include "IO.h"
 #include "Random.h"
 #include "Algorithm.h"
+#include "Converter.h"
 #include "RSA.h"
 #include "Command.h"
 #include <chrono>
@@ -76,7 +77,7 @@ void algoTest(BigInt a, BigInt b) {
 
 void test()
 {
-	io.readInputs(testCases);
+	io.readInputs(testCases, BigIntBase::BASE_10);
 
 	for (int i = 0; i < testCases.size(); i++) {
 		BigInt a, b;

@@ -1,5 +1,5 @@
-﻿#include "Algorithm.h"
-#include "IO.h"
+﻿#include "IO.h"
+#include "Algorithm.h"
 #include "Converter.h"
 #include "Random.h"
 
@@ -11,7 +11,7 @@ BigInt gcd(BigInt a, BigInt b)
 
 	if (a == 0 && b == 0 || b == 0)
 	{
-		io.writeLog("gcd(0, 0) of gcd(a, 0) is undefined");
+		io.writeLog("[gcd] gcd(0, 0) or gcd(a, 0) is undefined");
 		return r;
 	}
 
@@ -41,49 +41,6 @@ BigInt powMod(BigInt n, BigInt e, BigInt m)
 	return res;
 }
 
-bool millerRabinTest(BigInt n, BigInt d)
-{
-	// Sinh số a ngẫu nhiên a trong nửa đoạn [2, n - 1)
-	BigInt a = random.next(2, n - 1);
-
-	//io.writeLog("[isPrime] random a for checking: " + converter.bigIntToBinaryStr(a));
-
-	// Nếu a và n không nguyên tố cùng nhau thì là hợp số
-	if (gcd(a, n) != 1) {
-		io.writeLog("[isPrime] a and n is not relative prime, so n is composite!");
-		return false;
-	}
-
-	// Tính x = a^d mod n
-	BigInt x = powMod(a, d, n);
-	//io.writeLog("[isPrime] a^d mod n: " + converter.bigIntToBinaryStr(x));
-
-	// Nếu x = 1 hoặc x == n - 1 thì x không phải là cơ sở miller-rabin (miller-rabin witness) của n => không phải là hợp số
-	if (x == 1 || x == n - 1) {
-		io.writeLog("[isPrime] a^d mod n is 1 or n - 1, so n is probably prime");
-		return true;
-	}
-
-	// Kiểm tra các điều kiện của một số miller-rabin witness
-	while (d != n - 1)
-	{
-		x = (x * x) % n;
-		//io.writeLog("[isPrime] x^2 mod n: " + converter.bigIntToBinaryStr(x));
-
-		d <<= 1;
-		//io.writeLog("[isPrime] d: " + converter.bigIntToBinaryStr(d));
-
-		if (x == n - 1)
-		{
-			io.writeLog("[isPrime] x == n - 1, so n is propably prime!");
-			return true;
-		}
-	}
-
-	io.writeLog("[isPrime] a is a witness of n, so n is composite!");
-	return false;
-}
-
 tuple<BigInt, BigInt, BigInt> extendedEuclidean(BigInt a, BigInt b)
 {
 	if (a == 0) {
@@ -98,7 +55,8 @@ tuple<BigInt, BigInt, BigInt> extendedEuclidean(BigInt a, BigInt b)
 }
 
 // Todo: hiểu cách hoạt động của thuật toán
-BigInt inverseMod(BigInt a, BigInt m) {
+BigInt inverseMod(BigInt a, BigInt m)
+{
 	BigInt m0 = m, t, q;
 	BigInt x0 = 0, x1 = 1;
 
@@ -112,4 +70,46 @@ BigInt inverseMod(BigInt a, BigInt m) {
 
 	if (x1 < 0) x1 += m0;
 	return x1;
+}
+
+bool millerRabinTest(BigInt n, BigInt d)
+{
+	//? Sinh số a ngẫu nhiên a trong nửa đoạn [2, n - 1)
+	BigInt a = random.next(2, n - 1);
+	//io.writeLog("[isPrime] random a for checking: " + converter.bigIntToBinaryStr(a));
+
+	//? Nếu a và n không nguyên tố cùng nhau thì là hợp số
+	if (gcd(a, n) != 1) {
+		io.writeLog("[isPrime] a and n is not relative prime, so n is composite!");
+		return false;
+	}
+
+	//? Tính x = a^d mod n
+	BigInt x = powMod(a, d, n);
+	//io.writeLog("[isPrime] a^d mod n: " + converter.bigIntToBinaryStr(x));
+
+	//? Nếu x = 1 hoặc x == n - 1 thì x không phải là cơ sở miller-rabin (miller-rabin witness) của n => không phải là hợp số
+	if (x == 1 || x == n - 1) {
+		//io.writeLog("[isPrime] a^d mod n is 1 or n - 1, so n is probably prime");
+		return true;
+	}
+
+	//? Kiểm tra các điều kiện của một số miller-rabin witness
+	while (d != n - 1)
+	{
+		x = (x * x) % n;
+		//io.writeLog("[isPrime] x^2 mod n: " + converter.bigIntToBinaryStr(x));
+
+		d <<= 1;
+		//io.writeLog("[isPrime] d: " + converter.bigIntToBinaryStr(d));
+
+		if (x == n - 1)
+		{
+			//io.writeLog("[isPrime] x == n - 1, so n is propably prime!");
+			return true;
+		}
+	}
+
+	//io.writeLog("[isPrime] a is a witness of n, so n is composite!");
+	return false;
 }

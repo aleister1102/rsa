@@ -546,7 +546,8 @@ BigInt operator~(BigInt n) {
 	return res;
 }
 
-uint32_t getBitLength(BigInt n) {
+uint32_t BigInt::getBitLength() {
+	BigInt n = *this;
 	removeTrailingBytesIfNull(n);
 	uint32_t count = (n.byteCount * 8);
 
@@ -583,8 +584,8 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 	b = abs(b);
 
 	//* Lấy chênh lệch độ dài bit của hai số
-	int32_t bBitLength = getBitLength(b);
-	int32_t deltaBitLength = getBitLength(a) - bBitLength;
+	int32_t bBitLength = b.getBitLength();
+	int32_t deltaBitLength = a.getBitLength() - bBitLength;
 
 	//* Lặp đến khi độ dài bit của hai số giống nhau (chênh lệch = 0)
 	while (deltaBitLength > 1)
@@ -598,7 +599,7 @@ void division(BigInt a, BigInt b, BigInt& q, BigInt& r)
 		//* Dịch vị trí của b sang trái delta vị trí và trừ vào số bị chia (số a)
 		a = a - (b << deltaBitLength);
 
-		deltaBitLength = getBitLength(a) - bBitLength;
+		deltaBitLength = a.getBitLength() - bBitLength;
 
 		isDivided = true;
 	}

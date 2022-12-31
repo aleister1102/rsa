@@ -1,6 +1,7 @@
 ﻿#include "RSA.h"
 #include "IO.h"
 #include "Algorithm.h"
+#include "Converter.h"
 #include "Random.h"
 #include <fstream>
 
@@ -152,9 +153,9 @@ void RSA::encryptFile(string plainTextFile, string cipherTextFile)
 	if (io.openFile(pfs, plainTextFile, ios::in) == false) return;
 	if (io.openFile(cfs, cipherTextFile, ios::out) == false) return;
 
-	string plainText = io.readContent(pfs);
+	string plainText = io.readFile(pfs);
 	string cipherText = encrypt(plainText);
-	io.writeOutput(cfs, cipherText);
+	cfs << cipherText;
 
 	pfs.close();
 	cfs.close();
@@ -170,9 +171,9 @@ void RSA::decryptFile(string cipherTextFile, string plainTextFile)
 	if (io.openFile(cfs, cipherTextFile, ios::in) == false) return;
 	if (io.openFile(pfs, plainTextFile, ios::out) == false) return;
 
-	string cipherText = io.readContent(cfs);
+	string cipherText = io.readFile(cfs);
 	string plainText = decrypt(cipherText);
-	io.writeOutput(pfs, plainText);
+	pfs << plainText;
 
 	cfs.close();
 	pfs.close();
