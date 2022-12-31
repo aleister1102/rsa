@@ -1,9 +1,9 @@
-#include "Test.h"
-#include "IO.h"
-#include "RSA.h"
-#include "Converter.h"
-#include "Random.h"
-#include "Algorithm.h"
+#include "include/Test.h"
+#include "include/IO.h"
+#include "include/RSA.h"
+#include "include/Converter.h"
+#include "include/Random.h"
+#include "include/Algorithm.h"
 
 using std::tie;
 using std::to_string;
@@ -105,8 +105,8 @@ void Test::testRSA()
 
 void Test::runTest(string type)
 {
-	io.clearFile("log.txt");
-	io.clearFile("output.txt");
+	io.clearFile("resources/log.txt");
+	io.clearFile("resources/output.txt");
 	io.readInputs(testCases, base);
 
 	if (type == "operators")

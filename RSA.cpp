@@ -1,8 +1,8 @@
-﻿#include "RSA.h"
-#include "IO.h"
-#include "Algorithm.h"
-#include "Random.h"
-#include "Converter.h"
+﻿#include "include/RSA.h"
+#include "include/IO.h"
+#include "include/Algorithm.h"
+#include "include/Random.h"
+#include "include/Converter.h"
 
 using std::to_string;
 using std::fstream;
@@ -95,8 +95,13 @@ void RSA::generateDecryptionKey()
 string RSA::encrypt(string plainText) {
 	string cipherText = "";
 
-	io.writeLog("[RSA::encrypt] encrypting " + plainText);
+	if (e == 0 || n == 0)
+	{
+		io.writeConsole("Keys is missing!!!");
+		return cipherText;
+	}
 
+	io.writeLog("[RSA::encrypt] encrypting " + plainText);
 	for (char character : plainText)
 	{
 		io.writeLog("[RSA::encrypt] encrypt: " + to_string(character));
@@ -123,8 +128,13 @@ string RSA::decrypt(string cipherText) {
 	string plainText = "";
 	string str = "";
 
-	io.writeLog("[RSA::decrypt] decrypting...");
+	if (d == 0 || n == 0)
+	{
+		io.writeConsole("Keys is missing!!!");
+		return plainText;
+	}
 
+	io.writeLog("[RSA::decrypt] decrypting...");
 	for (char character : cipherText)
 	{
 		if (character != ' ')
@@ -141,11 +151,11 @@ string RSA::decrypt(string cipherText) {
 
 			BigInt m = powMod(c, d, n);
 
-			//io.writeLog("[RSA::encrypt] ascii value: ", m, base);
+			//io.writeLog("[RSA::encrypt] ascii value as BigInt: ", m, base);
 
 			int ascii = m.getIntValue();
 
-			io.writeLog("[RSA::encrypt] ascii value as int: " + to_string(ascii));
+			io.writeLog("[RSA::encrypt] ascii value: " + to_string(ascii));
 
 			plainText += char(ascii);
 
@@ -173,6 +183,8 @@ void RSA::encryptFile(string plainTextFile, string cipherTextFile)
 	cfs.close();
 
 	io.writeConsole("Finish encrypting!");
+	io.writeConsole("Press any key to continue...");
+	system("pause>0");
 }
 
 void RSA::decryptFile(string cipherTextFile, string plainTextFile)
@@ -191,6 +203,8 @@ void RSA::decryptFile(string cipherTextFile, string plainTextFile)
 	pfs.close();
 
 	io.writeConsole("Finish decrypting!");
+	io.writeConsole("Press any key to continue...");
+	system("pause>0");
 }
 
 string RSA::getKeys()
@@ -214,5 +228,3 @@ string RSA::getKeys()
 
 	return keys;
 }
-
-// Todo: chuyển sang lớp IO

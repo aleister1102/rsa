@@ -1,6 +1,6 @@
-﻿#include "IO.h"
-#include "Random.h"
-#include "Converter.h"
+﻿#include "include/IO.h"
+#include "include/Random.h"
+#include "include/Converter.h"
 
 BigInt Random::next(uint32_t byteCount)
 {

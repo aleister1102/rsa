@@ -140,24 +140,24 @@
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Algorithm.h" />
-    <ClInclude Include="BigInt.h" />
-    <ClInclude Include="Converter.h" />
-    <ClInclude Include="Command.h" />
-    <ClInclude Include="IO.h" />
-    <ClInclude Include="Random.h" />
-    <ClInclude Include="RSA.h" />
-    <ClInclude Include="Test.h" />
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="include\Algorithm.h" />
+    <ClInclude Include="include\BigInt.h" />
+    <ClInclude Include="include\Command.h" />
+    <ClInclude Include="include\Converter.h" />
+    <ClInclude Include="include\IO.h" />
+    <ClInclude Include="include\Random.h" />
+    <ClInclude Include="include\RSA.h" />
+    <ClInclude Include="include\Test.h" />
+    <ClInclude Include="include\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="cipher.txt" />
     <Text Include="decrypted.txt" />
-    <Text Include="input.txt" />
     <Text Include="keys.txt" />
-    <Text Include="log.txt" />
-    <Text Include="output.txt" />
     <Text Include="plain.txt" />
+    <Text Include="resources\input.txt" />
+    <Text Include="resources\log.txt" />
+    <Text Include="resources\output.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

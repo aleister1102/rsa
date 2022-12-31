@@ -1,6 +1,6 @@
-#include "Converter.h"
-#include "IO.h"
-#include "Utils.h"
+#include "include/Converter.h"
+#include "include/IO.h"
+#include "include/Utils.h"
 
 char Converter::intToDigit(int value)
 {
@@ -189,7 +189,6 @@ tuple<BigInt, BigInt, BigInt>  Converter::toRSAKeys(tuple<string, string, string
 		e = converter.binaryStrToBigInt(eStr);
 		d = converter.binaryStrToBigInt(dStr);
 	}
-
 
 	return std::make_tuple(n, e, d);
 }

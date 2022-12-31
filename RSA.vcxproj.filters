@@ -47,54 +47,54 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BigInt.h">
+    <ClInclude Include="include\Algorithm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Converter.h">
+    <ClInclude Include="include\BigInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IO.h">
+    <ClInclude Include="include\Command.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Algorithm.h">
+    <ClInclude Include="include\Converter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Random.h">
+    <ClInclude Include="include\IO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RSA.h">
+    <ClInclude Include="include\Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Command.h">
+    <ClInclude Include="include\RSA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Test.h">
+    <ClInclude Include="include\Test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utils.h">
+    <ClInclude Include="include\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="input.txt">
+    <Text Include="resources\input.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="output.txt">
+    <Text Include="resources\log.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="log.txt">
+    <Text Include="resources\output.txt">
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="cipher.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="plain.txt">
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="decrypted.txt">
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="keys.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="plain.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

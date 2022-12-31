@@ -1,6 +1,6 @@
-#include "IO.h"
-#include "Utils.h"
-#include "Converter.h"
+#include "include/IO.h"
+#include "include/Utils.h"
+#include "include/Converter.h"
 
 using std::cin;
 using std::endl;
@@ -11,7 +11,7 @@ using std::make_tuple;
 
 void IO::readInputs(vector<tuple<BigInt, BigInt>>& testCases, int base)
 {
-	fstream f("input.txt", ios::in);
+	fstream f("resources/input.txt", ios::in);
 	string numberA, numberB;
 
 	if (f.is_open())
@@ -42,7 +42,7 @@ void IO::readInputs(vector<tuple<BigInt, BigInt>>& testCases, int base)
 
 void IO::writeOutputs(BigInt a, BigInt b, BigInt res, string op, int base)
 {
-	fstream f("output.txt", ios::app);
+	fstream f("resources/output.txt", ios::app);
 
 	if (base == BigIntBase::BASE_10) {
 		f << converter.bigIntToDecimalStr(a)
@@ -66,7 +66,7 @@ void IO::writeOutputs(BigInt a, BigInt b, BigInt res, string op, int base)
 
 void IO::writeLog(string log)
 {
-	fstream f("log.txt", ios::app);
+	fstream f("resources/log.txt", ios::app);
 
 	f << log << endl;
 
@@ -75,7 +75,7 @@ void IO::writeLog(string log)
 
 void IO::writeLog(string prefix, BigInt n, int base)
 {
-	fstream f("log.txt", ios::app);
+	fstream f("resources/log.txt", ios::app);
 
 	f << prefix;
 
@@ -90,7 +90,7 @@ void IO::writeLog(string prefix, BigInt n, int base)
 
 void IO::writeOutput(string output)
 {
-	fstream f("output.txt", ios::app);
+	fstream f("resources/output.txt", ios::app);
 
 	f << output << endl;
 
@@ -99,7 +99,7 @@ void IO::writeOutput(string output)
 
 void IO::writeOutput(string prefix, BigInt n, int base)
 {
-	fstream f("output.txt", ios::app);
+	fstream f("resources/output.txt", ios::app);
 
 	f << prefix;
 

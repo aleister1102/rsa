@@ -1,7 +1,7 @@
-﻿#include "RSA.h"
-#include "IO.h"
-#include "Command.h"
-#include "Converter.h"
+﻿#include "include/RSA.h"
+#include "include/IO.h"
+#include "include/Command.h"
+#include "include/Converter.h"
 
 using std::cout;
 using std::cin;
@@ -191,7 +191,7 @@ int printOperationMenu()
 	int operation = 0;
 
 	do {
-		cout << "\n==== OPERATION ====\n";
+		cout << "==== OPERATION ====\n";
 		cout << "1. Encrypt\n";
 		cout << "2. Decrypt\n";
 		cout << "Select operation: ";
@@ -230,8 +230,8 @@ void handleOperationMenu(RSA rsa, int option)
 
 void Command::run()
 {
-	io.clearFile("log.txt");
-	io.clearFile("output.txt");
+	io.clearFile("resources/log.txt");
+	io.clearFile("resources/output.txt");
 
 	bool exit = false;
 	RSA rsa;
