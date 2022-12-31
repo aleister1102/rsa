@@ -7,7 +7,7 @@ using std::string;
 class RSA
 {
 public:
-	void exportKeys(int exportMethod);
+	string getKeys();
 	string encrypt(string plainText);
 	string decrypt(string cipherText);
 	void encryptFile(string p, string c);
@@ -35,7 +35,6 @@ private:
 	BigInt phi = 0;
 
 private:
-	string getKeys();
 	void generatePrimes();
 	void calculateNandPhi();
 	void generateEncryptionKey();

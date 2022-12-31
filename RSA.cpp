@@ -33,14 +33,14 @@ void RSA::generatePrimes()
 
 	do {
 		p = random.next(byteCount);
-		io.writeLog("[RSA::generatePrimes] random p: ", p, base);
+		//io.writeLog("[RSA::generatePrimes] random p: ", p, base);
 	} while (p.isPrime(RSA::checkPrimeLoops) == false);
 
 	io.writeOutput("[RSA::generatePrimes] prime p: ", p, base);
 
 	do {
 		q = random.next(byteCount);
-		io.writeLog("[RSA::generatePrimes] random q: ", p, base);
+		//io.writeLog("[RSA::generatePrimes] random q: ", p, base);
 	} while (q.isPrime(RSA::checkPrimeLoops) == false);
 
 	io.writeOutput("[RSA::generatePrimes] prime q: ", q, base);
@@ -215,29 +215,4 @@ string RSA::getKeys()
 	return keys;
 }
 
-void RSA::exportKeys(int exportMethod)
-{
-	io.writeConsole("Exporting keys...");
-
-	fstream fs("keys.txt", ios::out);
-	if (fs.is_open() == false) return;
-
-	string keys = getKeys();
-
-	if (exportMethod == 1)
-	{
-		fs << keys;
-		io.writeConsole("Finish exporting keys! Please check 'keys.txt'");
-	}
-	else if (exportMethod == 2)
-	{
-		io.writeConsole(keys);
-		io.writeConsole("Finish exporting keys!");
-	}
-	else if (exportMethod == 3)
-	{
-		fs << keys;
-		io.writeConsole(keys);
-		io.writeConsole("Finish exporting keys! Please check 'keys.txt'");
-	}
-}
+// Todo: chuyển sang lớp IO

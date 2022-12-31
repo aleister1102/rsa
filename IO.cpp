@@ -152,7 +152,7 @@ string IO::readFile(fstream& fs)
 	return content;
 }
 
-tuple<string, string, string> IO::inputKeys(int base) {
+tuple<string, string, string> IO::insertKeys(int base) {
 	string nStr, eStr, dStr;
 
 	if (base == BigIntBase::BASE_10)
@@ -206,4 +206,34 @@ tuple<string, string> IO::inputFilesForDecryption()
 	writeConsole("[Decrypt] enter decrypted plain text file name: "); cin >> decryptedFile;
 
 	return make_tuple(cipherTextFile, decryptedFile);
+}
+
+void IO::exportKeys(RSA rsa, int exportMethod)
+{
+	io.writeConsole("Exporting keys...");
+
+	fstream fs("keys.txt", ios::out);
+	if (fs.is_open() == false) return;
+
+	string keys = rsa.getKeys();
+
+	if (exportMethod == ExportMethod::FILE)
+	{
+		fs << keys;
+		io.writeConsole("Finish exporting keys! Please check 'keys.txt'");
+	}
+	else if (exportMethod == ExportMethod::CONSOLE)
+	{
+		io.writeConsole(keys);
+		io.writeConsole("Finish exporting keys!");
+	}
+	else if (exportMethod == ExportMethod::BOTH)
+	{
+		fs << keys;
+		io.writeConsole(keys);
+		io.writeConsole("Finish exporting keys! Please check 'keys.txt'");
+	}
+
+	io.writeConsole("Press any key to continue.");
+	system("pause>0");
 }

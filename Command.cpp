@@ -14,7 +14,25 @@ bool isValidCommand(int command, int commandCount)
 	return command > 0 && command <= commandCount;
 }
 
-int runKeyTypeMenu()
+int printMainMenu()
+{
+	int command = 0;
+
+	do {
+		system("cls");
+		cout << "==== Welcome to RSA Cryptosystem ====\n";
+		cout << "1. Generate or insert keys\n";
+		cout << "2. Encrypt or decrypt\n";
+		cout << "3. Exit\n";
+		cout << "Select key type: ";
+		cin >> command;
+		system("cls");
+	} while (!isValidCommand(command, 3));
+
+	return command;
+}
+
+int printKeyTypeMenu()
 {
 	int type = 0;
 
@@ -29,10 +47,49 @@ int runKeyTypeMenu()
 	return type;
 }
 
-int runKeySizeMenu()
+RSA handleKeyTypeMenu(int type)
+{
+	switch (type)
+	{
+	case 1:
+	{
+		int keySize = handleKeySizeMenu(printKeySizeMenu());
+		int keyBase = handleKeyBaseMenu(printKeyBaseMenu());
+		int exportMethod = handleExportMethodMenu(printExportMethodMenu());
+
+		uint32_t rsaByteCount = BigInt::maxByteCount = keySize / 8;
+
+		RSA rsa(rsaByteCount, keyBase);
+
+		io.exportKeys(rsa, exportMethod);
+
+		return rsa;
+	}
+	case 2:
+	{
+		int keyBase = handleKeyBaseMenu(printKeyBaseMenu());
+
+		auto keys = io.insertKeys(keyBase);
+
+		// Todo: thay thế các cú pháp dùng tie bằng cú pháp structured bindings (C++17)
+		auto [n, e, d] = converter.toRSAKeys(keys, keyBase);
+
+		//! Bước xác định số byte tối đa này rất quan trọng, sẽ đảm bảo chương trình chạy đúng
+		BigInt::maxByteCount = getMaxByteCount(n.byteCount, d.byteCount);
+
+		RSA rsa(n, e, d, keyBase);
+
+		return rsa;
+	}
+	default:
+		return RSA();
+		break;
+	}
+};
+
+int printKeySizeMenu()
 {
 	int option = 0;
-	int keySize = 0;
 
 	do {
 		cout << "\n==== KEY SIZE ====\n";
@@ -45,6 +102,13 @@ int runKeySizeMenu()
 		cin >> option;
 	} while (!isValidCommand(option, 5));
 
+	return option;
+}
+
+int handleKeySizeMenu(int option)
+{
+	int keySize = 0;
+
 	if (option == 1)
 		keySize = 128;
 	else if (option == 2)
@@ -53,30 +117,15 @@ int runKeySizeMenu()
 		keySize = 512;
 	else if (option == 4)
 		keySize = 1024;
-	else
+	else if (option == 5)
 		keySize = 2048;
+	else
+		keySize = 0;
 
 	return keySize;
 }
 
-int runExportMethodMenu()
-{
-	int method = 0;
-
-	do {
-		cout << "\n==== EXPORT METHOD ====\n";
-		cout << "1. Export keys to keys.txt\n";
-		cout << "2. Display keys on console\n";
-		cout << "3. Both\n";
-		cout << "Select export method: ";
-		cin >> method;
-		system("cls");
-	} while (!isValidCommand(method, 3));
-
-	return method;
-}
-
-int runKeyBaseMenu()
+int printKeyBaseMenu()
 {
 	int option = 0;
 
@@ -92,7 +141,52 @@ int runKeyBaseMenu()
 	return option;
 }
 
-int runOperationMenu()
+int handleKeyBaseMenu(int option)
+{
+	int keyBase = option == 1 ? BigIntBase::BASE_10 : BigIntBase::BASE_2;
+	return keyBase;
+}
+
+int printExportMethodMenu()
+{
+	int option = 0;
+
+	do {
+		cout << "\n==== EXPORT METHOD ====\n";
+		cout << "1. Export keys to keys.txt\n";
+		cout << "2. Display keys on console\n";
+		cout << "3. Both\n";
+		cout << "Select export method: ";
+		cin >> option;
+		system("cls");
+	} while (!isValidCommand(option, 3));
+
+	return option;
+}
+
+int handleExportMethodMenu(int option)
+{
+	int method = 0;
+
+	switch (option)
+	{
+	case 1:
+		method = ExportMethod::FILE;
+		break;
+	case 2:
+		method = ExportMethod::CONSOLE;
+		break;
+	case 3:
+		method = ExportMethod::BOTH;
+		break;
+	default:
+		break;
+	}
+
+	return method;
+}
+
+int printOperationMenu()
 {
 	int operation = 0;
 
@@ -102,68 +196,14 @@ int runOperationMenu()
 		cout << "2. Decrypt\n";
 		cout << "Select operation: ";
 		cin >> operation;
-	} while (!isValidCommand(operation, 5));
+	} while (!isValidCommand(operation, 2));
 
 	return operation;
 }
 
-RSA createKeys(int keyType)
+void handleOperationMenu(RSA rsa, int option)
 {
-	switch (keyType)
-	{
-	case 1:
-	{
-		int keySize = runKeySizeMenu();
-		int keyBase = runKeyBaseMenu();
-		int exportMethod = runExportMethodMenu();
-
-		uint32_t rsaByteCount = BigInt::maxByteCount = keySize / 8;
-		int rsaBase = keyBase == 1 ? BigIntBase::BASE_10 : BigIntBase::BASE_2;
-
-		RSA rsa(rsaByteCount, rsaBase);
-
-		rsa.exportKeys(exportMethod);
-
-		return rsa;
-	}
-	case 2:
-	{
-		int keyBase = runKeyBaseMenu();
-		int rsaBase = keyBase == 1 ? BigIntBase::BASE_10 : BigIntBase::BASE_2;
-
-		auto keys = io.inputKeys(rsaBase);
-
-		// Todo: thay thế các cú pháp dùng tie bằng cú pháp structured bindings (C++17)
-		auto [n, e, d] = converter.toRSAKeys(keys, rsaBase);
-
-		//! Bước xác định số byte tối đa này rất quan trọng, sẽ đảm bảo chương trình chạy đúng
-		BigInt::maxByteCount = getMaxByteCount(n.byteCount, d.byteCount);
-
-		RSA rsa(n, e, d, rsaBase);
-
-		return rsa;
-	}
-	default:
-		return RSA();
-		break;
-	}
-};
-
-void Command::run()
-{
-	io.clearFile("log.txt");
-	io.clearFile("output.txt");
-
-	//? Lấy loại khóa (sinh ngẫu nhiên hoặc người dùng nhập)
-	int keyType = runKeyTypeMenu();
-
-	//? Tạo khóa
-	RSA rsa = createKeys(keyType);
-
-	//? Lấy thao tác mà người dùng muốn thực hiện
-	int operation = runOperationMenu();
-
-	switch (operation)
+	switch (option)
 	{
 	case 1:
 	{
@@ -186,4 +226,38 @@ void Command::run()
 	default:
 		break;
 	}
+}
+
+void Command::run()
+{
+	io.clearFile("log.txt");
+	io.clearFile("output.txt");
+
+	bool exit = false;
+	RSA rsa;
+
+	do {
+		int command = printMainMenu();
+
+		switch (command)
+		{
+		case 1:
+		{
+			rsa = handleKeyTypeMenu(printKeyTypeMenu());
+		}
+		break;
+		case 2:
+		{
+			handleOperationMenu(rsa, printOperationMenu());
+		}
+		break;
+		case 3:
+		{
+			exit = true;
+			break;
+		}
+		default:
+			break;
+		}
+	} while (exit == false);
 }
