@@ -1,11 +1,11 @@
-﻿#include "BigIntRandom.h"
-#include "BigIntConverter.h"
+﻿#include "Random.h"
+#include "Converter.h"
 #include "IO.h"
 
 using std::cout;
 using std::endl;
 
-BigInt BigIntRandom::next(uint32_t byteCount)
+BigInt Random::next(uint32_t byteCount)
 {
 	if (byteCount < 0) return BigInt();
 
@@ -19,11 +19,11 @@ BigInt BigIntRandom::next(uint32_t byteCount)
 
 	res = abs(res);
 
-	//io.writeLog("[BigIntRandom::next] random number: " + converter.bigIntToBinaryStr(res));
+	//io.writeLog("[Random::next] random number: " + converter.bigIntToBinaryStr(res));
 	return res;
 }
 
-BigInt BigIntRandom::next(BigInt n)
+BigInt Random::next(BigInt n)
 {
 	uint32_t maxBitCount = getBitLength(n);
 	uint32_t resByteCount = maxBitCount / 8 - 1;
@@ -32,16 +32,16 @@ BigInt BigIntRandom::next(BigInt n)
 	// Chia lấy dư để res không vượt quá n
 	res = res % n;
 
-	//io.writeLog("[BigIntRandom::next] random number smaller than n: " + converter.bigIntToBinaryStr(res));
+	//io.writeLog("[Random::next] random number smaller than n: " + converter.bigIntToBinaryStr(res));
 	return res;
 }
 
-BigInt BigIntRandom::next(BigInt a, BigInt b)
+BigInt Random::next(BigInt a, BigInt b)
 {
 	BigInt res = next(b - a);
 
 	res = res + a;
 
-	//io.writeLog("[BigIntRandom::next] random number in [a, b): " + converter.bigIntToBinaryStr(res));
+	//io.writeLog("[Random::next] random number in [a, b): " + converter.bigIntToBinaryStr(res));
 	return res;
 }

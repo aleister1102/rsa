@@ -130,21 +130,23 @@
   <ItemGroup>
     <ClCompile Include="Algorithm.cpp" />
     <ClCompile Include="BigInt.cpp" />
-    <ClCompile Include="BigIntConverter.cpp" />
+    <ClCompile Include="Converter.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="IO.cpp" />
-    <ClCompile Include="BigIntRandom.cpp" />
+    <ClCompile Include="Random.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RSA.cpp" />
+    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="BigInt.h" />
-    <ClInclude Include="BigIntConverter.h" />
+    <ClInclude Include="Converter.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="IO.h" />
-    <ClInclude Include="BigIntRandom.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="RSA.h" />
+    <ClInclude Include="Test.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="cipher.txt" />

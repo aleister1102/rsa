@@ -1,8 +1,8 @@
 #include "IO.h"
 #include "Algorithm.h"
 #include "BigInt.h";
-#include "BigIntRandom.h"
-#include "BigIntConverter.h"
+#include "Random.h"
+#include "Converter.h"
 
 using std::to_string;
 

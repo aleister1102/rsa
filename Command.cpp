@@ -1,6 +1,6 @@
 ﻿#include "Command.h"
 #include "RSA.h"
-#include "BigIntConverter.h"
+#include "Converter.h"
 #include "IO.h"
 #include <fstream>
 

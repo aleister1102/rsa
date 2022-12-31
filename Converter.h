@@ -3,7 +3,7 @@
 
 using std::string;
 
-class BigIntConverter
+class Converter
 {
 public:
 	char intToDigit(int value);
@@ -19,4 +19,4 @@ public:
 	BigInt decimalStrToBigInt(string str);
 };
 
-static BigIntConverter converter;
+static Converter converter;

@@ -1,6 +1,6 @@
 ﻿#include "BigInt.h"
 #include "IO.h"
-#include "BigIntRandom.h"
+#include "Random.h"
 #include "Algorithm.h"
 #include "RSA.h"
 #include "Command.h"

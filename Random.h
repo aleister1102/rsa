@@ -1,21 +1,21 @@
 #pragma once
 #include "BigInt.h"
 
-class BigIntRandom
+class Random
 {
 private:
-	static inline BigIntRandom* instance = nullptr;
+	static inline Random* instance = nullptr;
 
-	BigIntRandom()
+	Random()
 	{
 		srand(time(0));
 	}
 
 public:
-	static BigIntRandom* getInstance()
+	static Random* getInstance()
 	{
 		if (instance == nullptr)
-			instance = new BigIntRandom();
+			instance = new Random();
 
 		return instance;
 	}
@@ -26,4 +26,4 @@ public:
 	BigInt next(BigInt a, BigInt b);
 };
 
-static BigIntRandom random = *BigIntRandom::getInstance();
+static Random random = *Random::getInstance();

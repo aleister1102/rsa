@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "BigInt.h"
-#include "BigIntConverter.h"
+#include "Converter.h"
 #include <vector>
 #include <tuple>
 #include <fstream>

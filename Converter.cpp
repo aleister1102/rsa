@@ -1,4 +1,4 @@
-#include "BigIntConverter.h"
+#include "Converter.h"
 #include "IO.h"
 #include <regex>
 
@@ -25,7 +25,7 @@ string removeSpaces(string str)
 	return res;
 }
 
-char BigIntConverter::intToDigit(int value)
+char Converter::intToDigit(int value)
 {
 	char digit;
 
@@ -34,7 +34,7 @@ char BigIntConverter::intToDigit(int value)
 	return digit;
 }
 
-int BigIntConverter::digitToInt(char digit)
+int Converter::digitToInt(char digit)
 {
 	int value;
 
@@ -43,7 +43,7 @@ int BigIntConverter::digitToInt(char digit)
 	return value;
 }
 
-byte BigIntConverter::stringToByte(string str)
+byte Converter::stringToByte(string str)
 {
 	byte res = 0;
 
@@ -59,7 +59,7 @@ byte BigIntConverter::stringToByte(string str)
 	return res;
 }
 
-string BigIntConverter::byteToString(byte n, bool isReversed)
+string Converter::byteToString(byte n, bool isReversed)
 {
 	string res;
 
@@ -76,7 +76,7 @@ string BigIntConverter::byteToString(byte n, bool isReversed)
 	return res;
 }
 
-BigInt BigIntConverter::binaryStrToBigInt(string binStr)
+BigInt Converter::binaryStrToBigInt(string binStr)
 {
 	int length = binStr.length();
 	int offset = length;
@@ -99,7 +99,7 @@ BigInt BigIntConverter::binaryStrToBigInt(string binStr)
 			else
 				byteStr = binStr.substr(0, length);
 
-			res.bytes[i] = BigIntConverter::stringToByte(byteStr);
+			res.bytes[i] = Converter::stringToByte(byteStr);
 		}
 		catch (exception e)
 		{
@@ -113,7 +113,7 @@ BigInt BigIntConverter::binaryStrToBigInt(string binStr)
 	return res;
 }
 
-string BigIntConverter::bigIntToBinaryStr(BigInt n)
+string Converter::bigIntToBinaryStr(BigInt n)
 {
 	//cout << "Converting to binary string..." << endl;
 
@@ -122,7 +122,7 @@ string BigIntConverter::bigIntToBinaryStr(BigInt n)
 	{
 		for (int i = n.byteCount - 1; i >= 0; i--)
 		{
-			string str = BigIntConverter::byteToString(n.bytes[i], true);
+			string str = Converter::byteToString(n.bytes[i], true);
 			res += str;
 		}
 	}
@@ -135,7 +135,7 @@ string BigIntConverter::bigIntToBinaryStr(BigInt n)
 }
 
 // Bug: không cho ra kết quả đúng
-string BigIntConverter::bigIntToDecimalStr(BigInt n)
+string Converter::bigIntToDecimalStr(BigInt n)
 {
 	//cout << "Converting to decimal string..." << endl;
 
@@ -170,7 +170,7 @@ string BigIntConverter::bigIntToDecimalStr(BigInt n)
 }
 
 // Warn: khi kích thước BigInt::maxByteCount không đủ có thể dẫn đến tràn số
-BigInt BigIntConverter::decimalStrToBigInt(string decStr)
+BigInt Converter::decimalStrToBigInt(string decStr)
 {
 	BigInt res = 0;
 

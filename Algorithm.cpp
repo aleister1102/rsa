@@ -1,7 +1,7 @@
 ﻿#include "Algorithm.h"
 #include "IO.h"
-#include "BigIntConverter.h"
-#include "BigIntRandom.h"
+#include "Converter.h"
+#include "Random.h"
 
 BigInt gcd(BigInt a, BigInt b)
 {

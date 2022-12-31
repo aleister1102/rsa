@@ -18,6 +18,12 @@ static byte ByteMask[8] = {
 	0b10000000
 };
 
+class BigIntBase {
+public:
+	static inline int BASE_10 = 10;
+	static inline int BASE_2 = 2;
+};
+
 class BigInt
 {
 public:

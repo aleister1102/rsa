@@ -1,7 +1,7 @@
 ﻿#include "RSA.h"
 #include "IO.h"
 #include "Algorithm.h"
-#include "BigIntRandom.h"
+#include "Random.h"
 #include <fstream>
 
 using std::cout;
