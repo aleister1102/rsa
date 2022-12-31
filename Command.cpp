@@ -1,8 +1,7 @@
-﻿#include "Command.h"
-#include "RSA.h"
-#include "Converter.h"
+﻿#include "RSA.h"
 #include "IO.h"
-#include <fstream>
+#include "Command.h"
+#include "Converter.h"
 
 using std::cout;
 using std::cin;
@@ -57,7 +56,7 @@ int runKeySizeMenu()
 	else
 		keySize = 2048;
 
-	return keySize / 8;
+	return keySize;
 }
 
 int runExportMethodMenu()
@@ -77,15 +76,15 @@ int runExportMethodMenu()
 	return method;
 }
 
-int runKeyFormatMenu()
+int runKeyBaseMenu()
 {
 	int option = 0;
 
 	do {
-		cout << "\n==== KEY FORMAT ====\n";
+		cout << "\n==== KEY BASE ====\n";
 		cout << "1. Decimal\n";
 		cout << "2. Binary (recommended)\n";
-		cout << "Select key format: ";
+		cout << "Select key base: ";
 		cin >> option;
 		system("cls");
 	} while (!isValidCommand(option, 2));
@@ -110,52 +109,34 @@ int runOperationMenu()
 
 RSA createKeys(int keyType)
 {
-	BigInt n, e, d;
-
 	switch (keyType)
 	{
 	case 1:
 	{
 		int keySize = runKeySizeMenu();
-		int keyFormat = runKeyFormatMenu();
+		int keyBase = runKeyBaseMenu();
 		int exportMethod = runExportMethodMenu();
 
-		RSA rsa(BigInt::maxByteCount = keySize);
+		uint32_t rsaByteCount = BigInt::maxByteCount = keySize / 8;
+		int rsaBase = keyBase == 1 ? BigIntBase::BASE_10 : BigIntBase::BASE_2;
 
-		if (keyFormat == 1)
-			rsa.exportKeys(10, exportMethod);
-		else
-			rsa.exportKeys(2, exportMethod);
+		RSA rsa(rsaByteCount, rsaBase);
+
+		rsa.exportKeys(exportMethod);
 
 		return rsa;
 	}
 	case 2:
 	{
-		string nStr, eStr, dStr;
+		int keyBase = runKeyBaseMenu();
+		int rsaBase = keyBase == 1 ? BigIntBase::BASE_10 : BigIntBase::BASE_2;
 
-		int keyFormat = runKeyFormatMenu();
-		if (keyFormat == 1)
-		{
-			tie(nStr, eStr, dStr) = io.inputKeys(10);
+		auto keys = io.inputKeys(rsaBase);
 
-			n = converter.decimalStrToBigInt(nStr);
-			e = converter.decimalStrToBigInt(eStr);
-			d = converter.decimalStrToBigInt(dStr);
+		// Todo: thay thế các cú pháp dùng tie bằng cú pháp structured bindings (C++17)
+		auto [n, e, d] = converter.toRSAKeys(keys, rsaBase);
 
-			BigInt::maxByteCount = getMaxByteCount(n.byteCount, d.byteCount);
-		}
-		else if (keyFormat == 2)
-		{
-			tie(nStr, eStr, dStr) = io.inputKeys(2);
-
-			n = converter.binaryStrToBigInt(nStr);
-			e = converter.binaryStrToBigInt(eStr);
-			d = converter.binaryStrToBigInt(dStr);
-
-			BigInt::maxByteCount = getMaxByteCount(n.byteCount, d.byteCount);
-		}
-
-		RSA rsa(n, e, d);
+		RSA rsa(n, e, d, rsaBase);
 
 		return rsa;
 	}
@@ -167,13 +148,16 @@ RSA createKeys(int keyType)
 
 void Command::run()
 {
-	// Lấy loại khóa (sinh ngẫu nhiên hoặc người dùng nhập)
+	io.clearFile("log.txt");
+	io.clearFile("output.txt");
+
+	//? Lấy loại khóa (sinh ngẫu nhiên hoặc người dùng nhập)
 	int keyType = runKeyTypeMenu();
 
-	// Tạo khóa
+	//? Tạo khóa
 	RSA rsa = createKeys(keyType);
 
-	// Lấy thao tác mà người dùng muốn thực hiện
+	//? Lấy thao tác mà người dùng muốn thực hiện
 	int operation = runOperationMenu();
 
 	switch (operation)
