@@ -15,7 +15,7 @@ BigInt Random::next(uint32_t byteCount)
 
 	res = abs(res);
 
-	io.writeLog("[Random::next] random number: ", res, BigIntBase::BASE_10);
+	//io.writeLog("[Random::next] random number: ", res, BigIntBase::BASE_10);
 	return res;
 }
 
@@ -28,7 +28,7 @@ BigInt Random::next(BigInt n)
 	//? Chia lấy dư để res không vượt quá n
 	res = res % n;
 
-	io.writeLog("[Random::next] random number smaller than n: ", res, BigIntBase::BASE_10);
+	//io.writeLog("[Random::next] random number smaller than n: ", res, BigIntBase::BASE_10);
 	return res;
 }
 
@@ -38,6 +38,6 @@ BigInt Random::next(BigInt a, BigInt b)
 
 	res = res + a;
 
-	io.writeLog("[Random::next] random number in [a, b): ", res, BigIntBase::BASE_10);
+	//io.writeLog("[Random::next] random number in [a, b): ", res, BigIntBase::BASE_10);
 	return res;
 }

@@ -177,21 +177,19 @@ tuple<BigInt, BigInt, BigInt>  Converter::toRSAKeys(tuple<string, string, string
 	auto& [nStr, eStr, dStr] = keysStr;
 	BigInt n, e, d;
 
-	if (base == 1)
+	if (base == BigIntBase::BASE_10)
 	{
 		n = converter.decimalStrToBigInt(nStr);
 		e = converter.decimalStrToBigInt(eStr);
 		d = converter.decimalStrToBigInt(dStr);
 	}
-	else if (base == 2)
+	else if (base == BigIntBase::BASE_2)
 	{
 		n = converter.binaryStrToBigInt(nStr);
 		e = converter.binaryStrToBigInt(eStr);
 		d = converter.binaryStrToBigInt(dStr);
 	}
 
-	//! Bước xác định số byte này rất quan trọng, sẽ đảm bảo chương trình chạy đúng
-	BigInt::maxByteCount = getMaxByteCount(n.byteCount, d.byteCount);
 
 	return std::make_tuple(n, e, d);
 }

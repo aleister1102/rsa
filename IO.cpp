@@ -155,7 +155,7 @@ string IO::readFile(fstream& fs)
 tuple<string, string, string> IO::inputKeys(int base) {
 	string nStr, eStr, dStr;
 
-	if (base == 10)
+	if (base == BigIntBase::BASE_10)
 	{
 		do {
 			writeConsole("[Encrypt] enter decimal public key n: "); cin >> nStr;
@@ -167,7 +167,7 @@ tuple<string, string, string> IO::inputKeys(int base) {
 			writeConsole("[Encrypt] enter decimal private key d: "); cin >> dStr;
 		} while (!isValidDecimalStr(dStr));
 	}
-	else if (base == 2) {
+	else if (base == BigIntBase::BASE_2) {
 		do {
 			writeConsole("[Encrypt] enter binary public key n: "); cin >> nStr;
 		} while (!isValidBinaryStr(nStr));
@@ -189,9 +189,8 @@ tuple<string, string> IO::inputFilesForEncryption()
 	do {
 		writeConsole("[Encrypt] enter plain text file name: "); cin >> plainTextFile;
 	} while (!isFileExisted(plainTextFile));
-	do {
-		writeConsole("[Encrypt] enter cipher text file name: "); cin >> cipherTextFile;
-	} while (!isFileExisted(cipherTextFile));
+
+	writeConsole("[Encrypt] enter cipher text file name: "); cin >> cipherTextFile;
 
 	return make_tuple(plainTextFile, cipherTextFile);
 }
@@ -203,9 +202,8 @@ tuple<string, string> IO::inputFilesForDecryption()
 	do {
 		writeConsole("[Decrypt] enter cipher text file name: "); cin >> cipherTextFile;
 	} while (!isFileExisted(cipherTextFile));
-	do {
-		writeConsole("[Decrypt] enter decrypted plain text file name: "); cin >> decryptedFile;
-	} while (!isFileExisted(decryptedFile));
+
+	writeConsole("[Decrypt] enter decrypted plain text file name: "); cin >> decryptedFile;
 
 	return make_tuple(cipherTextFile, decryptedFile);
 }

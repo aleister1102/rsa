@@ -107,7 +107,7 @@ string RSA::encrypt(string plainText) {
 
 		BigInt c = powMod(m, e, n);
 
-		io.writeLog("[RSA::encrypt] cipher text: ", c, base);
+		//io.writeLog("[RSA::encrypt] cipher text: ", c, base);
 
 		if (base == BigIntBase::BASE_10)
 			cipherText += (converter.bigIntToDecimalStr(c) + " ");
@@ -141,11 +141,11 @@ string RSA::decrypt(string cipherText) {
 
 			BigInt m = powMod(c, d, n);
 
-			io.writeLog("[RSA::encrypt] ascii value: ", m, base);
+			//io.writeLog("[RSA::encrypt] ascii value: ", m, base);
 
 			int ascii = m.getIntValue();
 
-			//io.writeLog("[RSA::encrypt] ascii value as int: " + to_string(ascii));
+			io.writeLog("[RSA::encrypt] ascii value as int: " + to_string(ascii));
 
 			plainText += char(ascii);
 

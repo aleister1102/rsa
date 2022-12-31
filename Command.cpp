@@ -136,6 +136,9 @@ RSA createKeys(int keyType)
 		// Todo: thay thế các cú pháp dùng tie bằng cú pháp structured bindings (C++17)
 		auto [n, e, d] = converter.toRSAKeys(keys, rsaBase);
 
+		//! Bước xác định số byte tối đa này rất quan trọng, sẽ đảm bảo chương trình chạy đúng
+		BigInt::maxByteCount = getMaxByteCount(n.byteCount, d.byteCount);
+
 		RSA rsa(n, e, d, rsaBase);
 
 		return rsa;

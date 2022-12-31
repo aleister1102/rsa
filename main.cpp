@@ -6,12 +6,13 @@
 #include "RSA.h"
 #include "Test.h"
 #include "Command.h"
-#include <chrono>
 
 int main()
 {
-	Test::setBase(BigIntBase::BASE_10);
-	Test::runTest("rsa");
+	//Test::setBase(BigIntBase::BASE_10);
+	//Test::runTest("rsa");
+
+	Command::run();
 
 	return 0;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "BigInt.h"
 
+using std::cout;
 using std::string;
 
 class RSA
@@ -16,7 +17,7 @@ public:
 	RSA() {}
 	RSA(const RSA& other) { *this = other; }
 	RSA(uint32_t byteCount, int base = BigIntBase::BASE_2);
-	RSA(BigInt n, BigInt e, BigInt d, int base = BigIntBase::BASE_2) : n(n), e(e), d(d) {};
+	RSA(BigInt n, BigInt e, BigInt d, int base = BigIntBase::BASE_2) : n(n), e(e), d(d), base(base) {};
 
 public:
 	uint32_t byteCount = 0;
