@@ -17,7 +17,7 @@ void Test::stopClock()
 {
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-	io.writeOutput("Execution time: " + std::to_string(duration.count() / 10e3) + " milliseconds\n\n");
+	io.writeOutput("Execution time: " + std::to_string(duration.count() / 1e6) + " seconds\n\n");
 }
 
 void Test::setBase(int base)
