@@ -9,6 +9,7 @@
 
 int main()
 {
+	//BigInt::maxByteCount = 2048 / 8;
 	//Test::setBase(BigIntBase::BASE_10);
 	//Test::runTest("rsa");
 
