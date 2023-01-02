@@ -54,7 +54,6 @@ tuple<BigInt, BigInt, BigInt> extendedEuclidean(BigInt a, BigInt b)
 	return std::make_tuple(gcd, (y - (b / a) * x), x);
 }
 
-// Todo: hiểu cách hoạt động của thuật toán
 BigInt inverseMod(BigInt a, BigInt m)
 {
 	BigInt m0 = m, t, q;
